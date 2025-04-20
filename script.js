@@ -223,9 +223,10 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="flex flex-col md:flex-row items-start md:items-center gap-4 py-6">
             <div class="flex-grow">
                 <h2 class="text-base md:text-lg font-semibold mb-1">
-                    <a href="${productLink}" target="_blank" class="text-gray-800 hover:text-red-500 inline-flex items-center">
+                    <a href="${productLink}" target="_blank" class="text-gray-800 hover:text-red-500 inline-flex items-center group">
                       ${product['Product Name']}
                       <span class="md:hidden text-gray-500">${externalLinkSvg}</span>
+                      <span class="hidden md:inline-block opacity-0 group-hover:opacity-100 text-gray-500 transition-opacity">${externalLinkSvg}</span>
                     </a>
                 </h2>
                 <div class="text-xs md:text-sm text-gray-500 mb-1">
