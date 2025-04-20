@@ -198,6 +198,13 @@ document.addEventListener('DOMContentLoaded', function () {
       if (data.result === 'success' && Array.isArray(data.data)) {
         // Store all products (removed slice to show all)
         allProducts = data.data;
+
+        // Update the main heading with total count
+        const mainHeading = document.querySelector('h1');
+        if (mainHeading) {
+          mainHeading.innerHTML = `KPH Products Launches - 2025 🚀 <span class="text-sm font-normal text-gray-500">(${allProducts.length})</span>`;
+        }
+
         renderProducts(allProducts);
       } else {
         errorEl.style.display = 'block';
