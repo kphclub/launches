@@ -1,3 +1,16 @@
+// Function to search by maker name
+function searchByMaker(makerName) {
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.value = makerName;
+    // Trigger the input event to filter products
+    searchInput.dispatchEvent(new Event('input'));
+
+    // Scroll to the top if needed
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   const apiUrl =
     'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLghe4BEHoKurs0RWxNLZKvYEuXbMShfbFSiRGrd-BbjzzVNHOQ4UfBgbcawAo4JFGngi48UPy7HspJFRma3SjunawAko7hyaaoYlzxrc1Yh3YYR3VLgkQcckyj0qWVyotSn3QzcYdEw88HC-vSJ_8JT7VkEEptYZVGwnWRmWKTmoI_BAe9oEefTnk9SIWLlRdXgE9QQdFEIAZ_tc8uhcrrk5GloDa7OJHtAUnfhffFZpcWqY0NZRUh35WoXIXdTuTMYSEPK42OTPKLTVYUSqsCGTpi-4g&lib=MaA0q-A2gaHu9hOOlHeKGU59ACu_u5VqL';
@@ -5,8 +18,87 @@ document.addEventListener('DOMContentLoaded', function () {
   const loadingEl = document.getElementById('loading');
   const errorEl = document.getElementById('error');
   const searchInput = document.getElementById('search-input');
+  const clearSearchBtn = document.getElementById('clear-search');
+  const logoEl = document.getElementById('logo');
+  const pageTitleEl = document.getElementById('page-title');
 
   let allProducts = [];
+  let hashSearchFound = false;
+
+  // Function to clear search
+  function clearSearch() {
+    if (searchInput) {
+      searchInput.value = '';
+      // Update URL by removing hash
+      history.pushState(
+        '',
+        document.title,
+        window.location.pathname + window.location.search
+      );
+      // Render all products
+      renderProducts(allProducts);
+      // Hide clear button
+      if (clearSearchBtn) {
+        clearSearchBtn.classList.add('hidden');
+      }
+    }
+  }
+
+  // Add event listener for logo click
+  if (logoEl) {
+    logoEl.addEventListener('click', clearSearch);
+  }
+
+  // Add event listener for page title click
+  if (pageTitleEl) {
+    pageTitleEl.addEventListener('click', clearSearch);
+  }
+
+  // Add event listener for clear button
+  if (clearSearchBtn) {
+    clearSearchBtn.addEventListener('click', clearSearch);
+  }
+
+  // Function to toggle clear button visibility
+  function toggleClearButton() {
+    if (clearSearchBtn) {
+      if (searchInput && searchInput.value.trim() !== '') {
+        clearSearchBtn.classList.remove('hidden');
+      } else {
+        clearSearchBtn.classList.add('hidden');
+      }
+    }
+  }
+
+  // Function to update URL hash with search term
+  function updateUrlHash(searchTerm) {
+    if (searchTerm && searchTerm.trim() !== '') {
+      window.location.hash = encodeURIComponent(searchTerm);
+    } else {
+      // Remove hash if search is empty
+      history.pushState(
+        '',
+        document.title,
+        window.location.pathname + window.location.search
+      );
+    }
+  }
+
+  // Function to get search term from URL hash
+  function getSearchFromHash() {
+    if (window.location.hash) {
+      return decodeURIComponent(window.location.hash.substring(1));
+    }
+    return '';
+  }
+
+  // Check if there's a hash in the URL and set search input value immediately
+  const hashSearch = getSearchFromHash();
+  if (hashSearch && searchInput) {
+    searchInput.value = hashSearch;
+    hashSearchFound = true;
+    toggleClearButton(); // Show clear button if search has value
+  }
 
   // Function to ensure URL has https prefix
   function ensureHttps(url) {
@@ -136,7 +228,9 @@ document.addEventListener('DOMContentLoaded', function () {
                       <span class="md:hidden text-gray-500">${externalLinkSvg}</span>
                     </a>
                 </h2>
-                <div class="text-xs md:text-sm text-gray-500 mb-1">${product['Maker']}</div>
+                <div class="text-xs md:text-sm text-gray-500 mb-1">
+                  <span class="cursor-pointer hover:text-primary" onclick="searchByMaker('${product['Maker']}')">${product['Maker']}</span>
+                </div>
                 <p class="text-gray-800 text-sm md:text-base max-w-5xl mb-1">${product['Product Description']}</p>
                 <div class="text-xs text-gray-400">${launchDate}</div>
             </div>
@@ -182,6 +276,12 @@ document.addEventListener('DOMContentLoaded', function () {
       const query = e.target.value.trim();
       const filteredProducts = filterProducts(query);
       renderProducts(filteredProducts);
+
+      // Update URL hash with search term
+      updateUrlHash(query);
+
+      // Toggle clear button visibility
+      toggleClearButton();
     });
   }
 
@@ -202,10 +302,16 @@ document.addEventListener('DOMContentLoaded', function () {
         // Update the main heading with total count
         const mainHeading = document.querySelector('h1');
         if (mainHeading) {
-          mainHeading.innerHTML = `KPH Products Launches - 2025 🚀 <span class="text-sm font-normal text-gray-500">(${allProducts.length})</span>`;
+          mainHeading.innerHTML = `KPH Product Launches - 2025 🚀 <span class="text-sm font-normal text-gray-500">(${allProducts.length})</span>`;
         }
 
-        renderProducts(allProducts);
+        // If hash search was found on page load, filter products now
+        if (hashSearchFound) {
+          const filteredProducts = filterProducts(hashSearch);
+          renderProducts(filteredProducts);
+        } else {
+          renderProducts(allProducts);
+        }
       } else {
         errorEl.style.display = 'block';
       }

@@ -28,13 +28,18 @@
 <body class="bg-white text-gray-800 font-sans">
     <header class="flex items-center p-3 md:p-4 border-b border-gray-200 sticky top-0 bg-white z-10">
         <div class="flex items-center mr-2 md:mr-5">
-            <div class="w-auto h-8 md:h-10 px-2 md:px-3 rounded-full bg-primary flex items-center justify-center text-white font-bold text-md md:text-lg">KPH</div>
+            <div id="logo" class="w-auto h-8 md:h-10 px-2 md:px-3 rounded-full bg-primary flex items-center justify-center text-white font-bold text-md md:text-lg cursor-pointer">KPH</div>
         </div>
-        <div class="bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2 flex items-center w-full max-w-xs md:w-60 mr-auto">
+        <div class="bg-gray-100 rounded-lg px-2 md:px-4 py-1 md:py-2 flex items-center w-full max-w-xs md:w-60 mr-auto relative">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3C5.91 3 3 5.91 3 9.5C3 13.09 5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5C5 7.01 7.01 5 9.5 5C11.99 5 14 7.01 14 9.5C14 11.99 11.99 14 9.5 14Z" fill="#6f7287"/>
             </svg>
             <input id="search-input" type="text" placeholder="Search products..." class="bg-transparent border-none outline-none w-full ml-2 text-sm">
+            <button id="clear-search" class="hidden absolute right-3 text-gray-400 hover:text-gray-600">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/>
+                </svg>
+            </button>
         </div>
         <nav class="hidden md:flex items-center space-x-6 pr-2">
             <a href="https://kph.club" class="text-gray-700 hover:text-primary font-medium text-sm">KPH Home</a>
@@ -43,7 +48,7 @@
     </header>
 
     <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-8">
-        <h1 class="text-xl md:text-2xl font-bold mb-4 md:mb-8">KPH Products Launches - 2025 🚀</h1>
+        <h1 id="page-title" class="text-xl md:text-2xl font-bold mb-4 md:mb-8 cursor-pointer hover:text-primary">KPH Product Launches - 2025 🚀</h1>
         
         <div id="loading" class="flex justify-center my-12">
             <div class="w-10 h-10 rounded-full border-4 border-gray-200 border-l-primary animate-spin"></div>
