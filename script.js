@@ -209,6 +209,15 @@ document.addEventListener('DOMContentLoaded', function () {
       // Ensure product link has https
       const productLink = ensureHttps(product['Product Link']);
 
+      // Extract domain for favicon
+      let domain = '';
+      try {
+        domain = new URL(productLink).hostname;
+      } catch (e) {
+        // If URL parsing fails, use the whole link
+        domain = productLink;
+      }
+
       // Get formatted date from the Date key
       const launchDate = formatDate(product['Date']);
 
@@ -224,6 +233,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="flex-grow">
                 <h2 class="text-base md:text-lg font-semibold mb-1">
                     <a href="${productLink}" target="_blank" class="text-gray-800 hover:text-red-500 inline-flex items-center group">
+                      <img src="https://www.google.com/s2/favicons?domain=${domain}" alt="" class="mr-2 h-4 w-4" />
                       ${product['Product Name']}
                       <span class="md:hidden text-gray-500">${externalLinkSvg}</span>
                       <span class="hidden md:inline-block opacity-0 group-hover:opacity-100 text-gray-500 transition-opacity">${externalLinkSvg}</span>
