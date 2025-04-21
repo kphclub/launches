@@ -73,7 +73,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // Function to update URL hash with search term
   function updateUrlHash(searchTerm) {
     if (searchTerm && searchTerm.trim() !== '') {
-      window.location.hash = encodeURIComponent(searchTerm);
+      // Replace spaces with hyphens before encoding
+      const formatted = searchTerm.replace(/ /g, '-');
+      window.location.hash = encodeURIComponent(formatted);
     } else {
       // Remove hash if search is empty
       history.pushState(
@@ -87,7 +89,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // Function to get search term from URL hash
   function getSearchFromHash() {
     if (window.location.hash) {
-      return decodeURIComponent(window.location.hash.substring(1));
+      // Replace hyphens with spaces after decoding
+      const decoded = decodeURIComponent(window.location.hash.substring(1));
+      return decoded.replace(/-/g, ' ');
     }
     return '';
   }
