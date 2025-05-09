@@ -12,8 +12,7 @@ function searchByMaker(makerName) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  const apiUrl =
-    'https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLghe4BEHoKurs0RWxNLZKvYEuXbMShfbFSiRGrd-BbjzzVNHOQ4UfBgbcawAo4JFGngi48UPy7HspJFRma3SjunawAko7hyaaoYlzxrc1Yh3YYR3VLgkQcckyj0qWVyotSn3QzcYdEw88HC-vSJ_8JT7VkEEptYZVGwnWRmWKTmoI_BAe9oEefTnk9SIWLlRdXgE9QQdFEIAZ_tc8uhcrrk5GloDa7OJHtAUnfhffFZpcWqY0NZRUh35WoXIXdTuTMYSEPK42OTPKLTVYUSqsCGTpi-4g&lib=MaA0q-A2gaHu9hOOlHeKGU59ACu_u5VqL';
+  const apiUrl = 'https://kph-mafia.microcompany.workers.dev/api/products';
   const productListEl = document.getElementById('product-list');
   const loadingEl = document.getElementById('loading');
   const errorEl = document.getElementById('error');
