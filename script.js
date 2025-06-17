@@ -173,84 +173,6 @@ document.addEventListener('DOMContentLoaded', function () {
       }));
   }
 
-  // Function to calculate top makers
-  function calculateTopMakers(products, limit = 5) {
-    const makerCounts = {};
-
-    products.forEach((product) => {
-      const maker = product['Maker'];
-      if (maker) {
-        makerCounts[maker] = (makerCounts[maker] || 0) + 1;
-      }
-    });
-
-    return Object.entries(makerCounts)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, limit)
-      .map(([maker, count]) => ({ maker, count }));
-  }
-
-  // Function to render leaderboard
-  function renderLeaderboard(topMakers) {
-    const leaderboardEl = document.getElementById('leaderboard');
-    const leaderboardListEl = document.getElementById('leaderboard-list');
-
-    if (!leaderboardEl || !leaderboardListEl || topMakers.length === 0) {
-      if (leaderboardEl) leaderboardEl.classList.add('hidden');
-      return;
-    }
-
-    const medals = ['🥇', '🥈', '🥉', '🏅', '🏅'];
-
-    // Calculate ranks with ties
-    let currentRank = 1;
-    let previousCount = null;
-    const makersWithRanks = topMakers.map((item, index) => {
-      if (previousCount !== null && item.count < previousCount) {
-        currentRank++;
-      }
-      previousCount = item.count;
-
-      // Get medal based on rank position
-      let medalIndex;
-      if (currentRank === 1) medalIndex = 0; // 🥇
-      else if (currentRank === 2) medalIndex = 1; // 🥈
-      else if (currentRank === 3) medalIndex = 2; // 🥉
-      else medalIndex = 3; // 🏅
-
-      return {
-        ...item,
-        rank: currentRank,
-        medal: medals[medalIndex],
-      };
-    });
-
-    leaderboardListEl.innerHTML = makersWithRanks
-      .map(
-        (item) => `
-      <div class="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer" onclick="searchByMaker('${
-        item.maker
-      }')">
-        <div class="flex items-center space-x-3">
-          <span class="text-xl">${item.medal}</span>
-          <div>
-            <div class="font-semibold text-gray-800">${item.maker}</div>
-            <div class="text-sm text-gray-500">${item.count} product${
-          item.count !== 1 ? 's' : ''
-        }</div>
-          </div>
-        </div>
-        <div class="text-right">
-          <div class="text-lg font-bold text-primary">#${item.rank}</div>
-        </div>
-      </div>
-    `
-      )
-      .join('');
-
-    leaderboardEl.classList.remove('hidden');
-  }
-
   // Function to render filtered products grouped by month
   function renderProducts(products) {
     productListEl.innerHTML = '';
@@ -396,10 +318,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (mainHeading) {
           mainHeading.innerHTML = `KPH Product Launches - 2025 🚀 <span class="text-sm font-normal text-gray-500">(${allProducts.length})</span>`;
         }
-
-        // Calculate and render leaderboard (always based on all products)
-        const topMakers = calculateTopMakers(allProducts);
-        renderLeaderboard(topMakers);
 
         // If hash search was found on page load, filter products now
         if (hashSearchFound) {

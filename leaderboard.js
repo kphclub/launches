@@ -103,11 +103,25 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    // Calculate simple incrementing ranks (no ties)
+    // Calculate ranks with ties
+    let currentRank = 1;
+    let previousCount = null;
     const makersWithRanks = makers.map((item, index) => {
+      if (previousCount !== null && item.count < previousCount) {
+        currentRank = index + 1;
+      }
+      previousCount = item.count;
+
+      // Get medal based on rank
+      let medal = '';
+      if (currentRank === 1) medal = '🥇';
+      else if (currentRank === 2) medal = '🥈';
+      else if (currentRank === 3) medal = '🥉';
+
       return {
         ...item,
-        rank: index + 1,
+        rank: currentRank,
+        medal: medal,
       };
     });
 
@@ -117,11 +131,14 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="flex items-center justify-between p-4 md:p-6 hover:bg-gray-50 transition-colors cursor-pointer" onclick="goToMakerProducts('${
           item.maker
         }')">
-                    <div class="flex items-center space-x-4">
+          <div class="flex items-center space-x-4">
             <div class="flex items-center space-x-3">
-              <div class="text-lg font-bold text-gray-600 min-w-[3rem]">${
-                item.rank
-              }</div>
+              <div class="text-lg font-bold text-gray-600 min-w-[3rem] flex items-center space-x-1">
+                <span>${item.rank}</span>
+                ${
+                  item.medal ? `<span class="text-xl">${item.medal}</span>` : ''
+                }
+              </div>
             </div>
             <div>
               <div class="font-semibold text-gray-800 text-lg">${

@@ -41,37 +41,21 @@
                 </svg>
             </button>
         </div>
-        <nav class="hidden md:flex items-center space-x-6 pr-2">
-            <a href="leaderboard.html" class="text-gray-700 hover:text-primary font-medium text-sm">Leaderboard</a>
-        </nav>
-        <nav class="hidden md:flex items-center space-x-6 pr-2">
-            <a href="https://news.kph.club" class="text-gray-700 hover:text-primary font-medium text-sm">News</a>
-        </nav>
-        <nav class="hidden md:flex items-center space-x-6 pr-2">
-            <a href="https://join.kph.club" class="text-gray-700 hover:text-primary font-medium text-sm">Join KPH</a>
-        </nav>
+        <div class="flex items-center space-x-6">
+            <a href="leaderboard.html" class="text-gray-700 hover:text-primary font-medium text-sm">
+                🏆 Leaderboard
+            </a>
+            <nav class="hidden md:flex items-center space-x-6">
+                <a href="https://news.kph.club" class="text-gray-700 hover:text-primary font-medium text-sm">News</a>
+                <a href="https://join.kph.club" class="text-gray-700 hover:text-primary font-medium text-sm">Join KPH</a>
+            </nav>
+        </div>
     </header>
 
     <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-8">
         <h1 id="page-title" class="text-xl md:text-2xl font-bold mb-4 md:mb-8 cursor-pointer hover:text-primary">KPH Product Launches - 2025 🚀</h1>
         
-        <!-- Top 5 Makers Leaderboard -->
-        <div id="leaderboard" class="mb-8 hidden">
-            <h2 class="text-lg md:text-xl font-semibold mb-4 text-gray-800">🏆 Top 5 Makers</h2>
-            <div class="bg-gradient-to-r from-red-50 to-orange-50 rounded-lg p-4 md:p-6">
-                <div id="leaderboard-list" class="space-y-3">
-                    <!-- Leaderboard items will be inserted here -->
-                </div>
-                <div class="mt-4 pt-4 border-t border-red-100">
-                    <a href="leaderboard.html" class="inline-flex items-center text-sm font-medium text-primary hover:text-red-600 transition-colors">
-                        View Full Leaderboard
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-        </div>
+
         
         <div id="loading" class="flex justify-center my-12">
             <div class="w-10 h-10 rounded-full border-4 border-gray-200 border-l-primary animate-spin"></div>
