@@ -55,15 +55,6 @@
     <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-8">
         <div class="flex items-center justify-between mb-4 md:mb-8">
             <h1 id="page-title" class="text-xl md:text-2xl font-bold cursor-pointer hover:text-primary">KPH Makers Leaderboard - 2025 🏆</h1>
-
-        </div>
-        
-        <div id="loading" class="flex justify-center my-12">
-            <div class="w-10 h-10 rounded-full border-4 border-gray-200 border-l-primary animate-spin"></div>
-        </div>
-        
-        <div id="error" class="text-primary text-center py-5 hidden">
-            Failed to load makers data. Please try again later.
         </div>
         
         <!-- Stats Overview -->
@@ -81,12 +72,30 @@
                 <div class="text-sm text-gray-600">Avg Products/Week</div>
             </div>
         </div>
+        
+        <!-- Tab Navigation -->
+        <div class="flex border-b border-gray-200 mb-6">
+            <button id="tab-most-launches" class="tab-button px-4 py-2 font-medium text-sm border-b-2 border-primary text-primary">
+                Most Launches
+            </button>
+            <button id="tab-recent-launches" class="tab-button px-4 py-2 font-medium text-sm border-b-2 border-transparent text-gray-500 hover:text-gray-700">
+                Recent Launches
+            </button>
+        </div>
+        
+        <div id="loading" class="flex justify-center my-12">
+            <div class="w-10 h-10 rounded-full border-4 border-gray-200 border-l-primary animate-spin"></div>
+        </div>
+        
+        <div id="error" class="text-primary text-center py-5 hidden">
+            Failed to load makers data. Please try again later.
+        </div>
 
         <!-- Full Leaderboard -->
         <div id="full-leaderboard" class="bg-white rounded-lg shadow-sm border border-gray-200">
             <div class="p-4 md:p-6 border-b border-gray-200">
-                <h2 class="text-lg font-semibold text-gray-800">All Makers Ranking</h2>
-                <p class="text-sm text-gray-500 mt-1">Click on any maker to see their products</p>
+                <h2 id="leaderboard-title" class="text-lg font-semibold text-gray-800">Makers with Most Launches</h2>
+                <p id="leaderboard-subtitle" class="text-sm text-gray-500 mt-1">Click on any maker to see their products</p>
             </div>
             <div id="leaderboard-list" class="divide-y divide-gray-100">
                 <!-- Leaderboard items will be inserted here -->

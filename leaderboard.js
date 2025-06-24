@@ -8,15 +8,23 @@ document.addEventListener('DOMContentLoaded', function () {
   const logoEl = document.getElementById('logo');
   const pageTitleEl = document.getElementById('page-title');
   const statsOverviewEl = document.getElementById('stats-overview');
+  const tabMostLaunches = document.getElementById('tab-most-launches');
+  const tabRecentLaunches = document.getElementById('tab-recent-launches');
+  const leaderboardTitle = document.getElementById('leaderboard-title');
+  const leaderboardSubtitle = document.getElementById('leaderboard-subtitle');
 
   let allProducts = [];
   let allMakers = [];
+  let recentMakers = [];
+  let currentTab = 'most-launches';
 
   // Function to clear search
   function clearSearch() {
     if (searchInput) {
       searchInput.value = '';
-      renderLeaderboard(allMakers);
+      const currentMakers =
+        currentTab === 'most-launches' ? allMakers : recentMakers;
+      renderLeaderboard(currentMakers, currentTab);
       if (clearSearchBtn) {
         clearSearchBtn.classList.add('hidden');
       }
@@ -63,6 +71,74 @@ document.addEventListener('DOMContentLoaded', function () {
       .map(([maker, count]) => ({ maker, count }));
   }
 
+  // Function to calculate recent makers (sorted by most recent launch)
+  function calculateRecentMakers(products) {
+    const makerLastLaunch = {};
+    const makerCounts = {};
+
+    products.forEach((product) => {
+      const maker = product['Maker'];
+      const dateStr = product['Date']; // Fixed: use 'Date' instead of 'Launch Date'
+      if (maker && dateStr) {
+        const launchDate = new Date(dateStr);
+        if (!makerLastLaunch[maker] || launchDate > makerLastLaunch[maker]) {
+          makerLastLaunch[maker] = launchDate;
+        }
+        makerCounts[maker] = (makerCounts[maker] || 0) + 1;
+      }
+    });
+
+    return Object.entries(makerLastLaunch)
+      .sort(([, a], [, b]) => b - a) // Sort by most recent date
+      .map(([maker, lastLaunchDate]) => ({
+        maker,
+        count: makerCounts[maker],
+        lastLaunchDate: lastLaunchDate,
+      }));
+  }
+
+  // Function to switch tabs
+  function switchTab(tabName) {
+    currentTab = tabName;
+
+    // Update tab appearance
+    if (tabMostLaunches && tabRecentLaunches) {
+      if (tabName === 'most-launches') {
+        tabMostLaunches.classList.add('border-primary', 'text-primary');
+        tabMostLaunches.classList.remove('border-transparent', 'text-gray-500');
+        tabRecentLaunches.classList.add('border-transparent', 'text-gray-500');
+        tabRecentLaunches.classList.remove('border-primary', 'text-primary');
+      } else {
+        tabRecentLaunches.classList.add('border-primary', 'text-primary');
+        tabRecentLaunches.classList.remove(
+          'border-transparent',
+          'text-gray-500'
+        );
+        tabMostLaunches.classList.add('border-transparent', 'text-gray-500');
+        tabMostLaunches.classList.remove('border-primary', 'text-primary');
+      }
+    }
+
+    // Update leaderboard title and subtitle based on active tab
+    if (leaderboardTitle && leaderboardSubtitle) {
+      if (tabName === 'most-launches') {
+        leaderboardTitle.textContent = 'Makers with Most Launches';
+        leaderboardSubtitle.textContent =
+          'Makers ranked by total number of products launched';
+      } else {
+        leaderboardTitle.textContent = 'Makers with Recent Launches';
+        leaderboardSubtitle.textContent =
+          'Makers sorted by their most recent product launch';
+      }
+    }
+
+    // Clear search and render appropriate data
+    clearSearch();
+    const currentMakers =
+      tabName === 'most-launches' ? allMakers : recentMakers;
+    renderLeaderboard(currentMakers, tabName);
+  }
+
   // Function to render stats overview
   function renderStats(makers, totalProducts) {
     if (!statsOverviewEl) return;
@@ -91,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Function to render full leaderboard
-  function renderLeaderboard(makers) {
+  function renderLeaderboard(makers, tabType = 'most-launches') {
     if (!leaderboardListEl) return;
 
     if (makers.length === 0) {
@@ -103,20 +179,27 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    // Calculate ranks with ties
+    // Calculate ranks with ties (for most launches tab)
     let currentRank = 1;
-    let previousCount = null;
+    let previousValue = null;
     const makersWithRanks = makers.map((item, index) => {
-      if (previousCount !== null && item.count < previousCount) {
+      // For most launches, rank by count; for recent launches, just use position
+      if (tabType === 'most-launches') {
+        if (previousValue !== null && item.count < previousValue) {
+          currentRank = index + 1;
+        }
+        previousValue = item.count;
+      } else {
         currentRank = index + 1;
       }
-      previousCount = item.count;
 
-      // Get medal based on rank
+      // Get medal based on rank (only for most launches)
       let medal = '';
-      if (currentRank === 1) medal = '🥇';
-      else if (currentRank === 2) medal = '🥈';
-      else if (currentRank === 3) medal = '🥉';
+      if (tabType === 'most-launches') {
+        if (currentRank === 1) medal = '🥇';
+        else if (currentRank === 2) medal = '🥈';
+        else if (currentRank === 3) medal = '🥉';
+      }
 
       return {
         ...item,
@@ -124,6 +207,15 @@ document.addEventListener('DOMContentLoaded', function () {
         medal: medal,
       };
     });
+
+    // Helper function to format date
+    function formatDate(date) {
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    }
 
     leaderboardListEl.innerHTML = makersWithRanks
       .map(
@@ -145,7 +237,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 item.maker
               }</div>
               <div class="text-sm text-gray-500">
-                ${item.count} product${item.count !== 1 ? 's' : ''} launched
+                ${
+                  tabType === 'most-launches'
+                    ? `${item.count} product${
+                        item.count !== 1 ? 's' : ''
+                      } launched`
+                    : `${item.count} product${
+                        item.count !== 1 ? 's' : ''
+                      } • Last launch: ${formatDate(item.lastLaunchDate)}`
+                }
               </div>
             </div>
           </div>
@@ -173,10 +273,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Function to filter makers based on search query
   function filterMakers(query) {
-    if (!query) return allMakers;
+    if (!query) {
+      return currentTab === 'most-launches' ? allMakers : recentMakers;
+    }
 
     query = query.toLowerCase();
-    return allMakers.filter((maker) => {
+    const sourceData =
+      currentTab === 'most-launches' ? allMakers : recentMakers;
+    return sourceData.filter((maker) => {
       return maker.maker.toLowerCase().includes(query);
     });
   }
@@ -186,9 +290,20 @@ document.addEventListener('DOMContentLoaded', function () {
     searchInput.addEventListener('input', function (e) {
       const query = e.target.value.trim();
       const filteredMakers = filterMakers(query);
-      renderLeaderboard(filteredMakers);
+      renderLeaderboard(filteredMakers, currentTab);
       toggleClearButton();
     });
+  }
+
+  // Add event listeners for tab buttons
+  if (tabMostLaunches) {
+    tabMostLaunches.addEventListener('click', () => switchTab('most-launches'));
+  }
+
+  if (tabRecentLaunches) {
+    tabRecentLaunches.addEventListener('click', () =>
+      switchTab('recent-launches')
+    );
   }
 
   // Fetch and load data
@@ -205,12 +320,13 @@ document.addEventListener('DOMContentLoaded', function () {
       if (data.result === 'success' && Array.isArray(data.data)) {
         allProducts = data.data;
         allMakers = calculateAllMakers(allProducts);
+        recentMakers = calculateRecentMakers(allProducts);
 
         // Render stats overview
         renderStats(allMakers, allProducts.length);
 
-        // Render full leaderboard
-        renderLeaderboard(allMakers);
+        // Render full leaderboard (default to most launches tab)
+        renderLeaderboard(allMakers, currentTab);
       } else {
         errorEl.style.display = 'block';
       }
