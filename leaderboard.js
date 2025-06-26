@@ -12,11 +12,17 @@ document.addEventListener('DOMContentLoaded', function () {
   const tabRecentLaunches = document.getElementById('tab-recent-launches');
   const leaderboardTitle = document.getElementById('leaderboard-title');
   const leaderboardSubtitle = document.getElementById('leaderboard-subtitle');
+  const fullLeaderboardEl = document.getElementById('full-leaderboard');
 
   let allProducts = [];
   let allMakers = [];
   let recentMakers = [];
   let currentTab = 'most-launches';
+
+  // Hide leaderboard initially while loading
+  if (fullLeaderboardEl) {
+    fullLeaderboardEl.style.display = 'none';
+  }
 
   // Function to clear search
   function clearSearch() {
@@ -242,15 +248,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     ? `${item.count} product${
                         item.count !== 1 ? 's' : ''
                       } launched`
-                    : `${item.count} product${
-                        item.count !== 1 ? 's' : ''
-                      } • Last launch: ${formatDate(item.lastLaunchDate)}`
+                    : `Last launch: ${formatDate(item.lastLaunchDate)}`
                 }
               </div>
             </div>
           </div>
           <div class="flex items-center space-x-2 text-gray-400">
-            <span class="text-sm">View products</span>
+            <span class="text-sm hidden md:inline">View products</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="9 18 15 12 9 6"></polyline>
             </svg>
@@ -321,6 +325,11 @@ document.addEventListener('DOMContentLoaded', function () {
         allProducts = data.data;
         allMakers = calculateAllMakers(allProducts);
         recentMakers = calculateRecentMakers(allProducts);
+
+        // Show leaderboard after data is loaded
+        if (fullLeaderboardEl) {
+          fullLeaderboardEl.style.display = 'block';
+        }
 
         // Render stats overview
         renderStats(allMakers, allProducts.length);
