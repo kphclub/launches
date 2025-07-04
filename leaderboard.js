@@ -13,15 +13,21 @@ document.addEventListener('DOMContentLoaded', function () {
   const leaderboardTitle = document.getElementById('leaderboard-title');
   const leaderboardSubtitle = document.getElementById('leaderboard-subtitle');
   const fullLeaderboardEl = document.getElementById('full-leaderboard');
+  const tabSwitcherEl = document.querySelector(
+    '.flex.border-b.border-gray-200.mb-6'
+  );
 
   let allProducts = [];
   let allMakers = [];
   let recentMakers = [];
   let currentTab = 'most-launches';
 
-  // Hide leaderboard initially while loading
+  // Hide leaderboard and tab switcher initially while loading
   if (fullLeaderboardEl) {
     fullLeaderboardEl.style.display = 'none';
+  }
+  if (tabSwitcherEl) {
+    tabSwitcherEl.style.display = 'none';
   }
 
   // Function to clear search
@@ -185,31 +191,30 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    // Calculate ranks with ties (for most launches tab)
-    let currentRank = 1;
-    let previousValue = null;
+    // Calculate ranks and medals separately
     const makersWithRanks = makers.map((item, index) => {
-      // For most launches, rank by count; for recent launches, just use position
-      if (tabType === 'most-launches') {
-        if (previousValue !== null && item.count < previousValue) {
-          currentRank = index + 1;
-        }
-        previousValue = item.count;
-      } else {
-        currentRank = index + 1;
-      }
+      const position = index + 1; // Always sequential position numbers
 
-      // Get medal based on rank (only for most launches)
+      // Calculate medal rank for most launches tab (consecutive ranks for ties)
+      let medalRank = null;
       let medal = '';
+
       if (tabType === 'most-launches') {
-        if (currentRank === 1) medal = '🥇';
-        else if (currentRank === 2) medal = '🥈';
-        else if (currentRank === 3) medal = '🥉';
+        // Find unique product counts and assign consecutive medal ranks
+        const uniqueCounts = [...new Set(makers.map((m) => m.count))].sort(
+          (a, b) => b - a
+        );
+        medalRank = uniqueCounts.indexOf(item.count) + 1;
+
+        if (medalRank === 1) medal = '🥇';
+        else if (medalRank === 2) medal = '🥈';
+        else if (medalRank === 3) medal = '🥉';
       }
 
       return {
         ...item,
-        rank: currentRank,
+        rank: position,
+        medalRank: medalRank,
         medal: medal,
       };
     });
@@ -326,9 +331,12 @@ document.addEventListener('DOMContentLoaded', function () {
         allMakers = calculateAllMakers(allProducts);
         recentMakers = calculateRecentMakers(allProducts);
 
-        // Show leaderboard after data is loaded
+        // Show leaderboard and tab switcher after data is loaded
         if (fullLeaderboardEl) {
           fullLeaderboardEl.style.display = 'block';
+        }
+        if (tabSwitcherEl) {
+          tabSwitcherEl.style.display = 'flex';
         }
 
         // Render stats overview
