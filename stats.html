@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KPH Makers Leaderboard</title>
+    <title>KPH Makers Stats</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="icon" type="image/png" href="https://kph.club/favicon.png" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script defer data-domain="launches.kph.club" src="https://record.micro.company/script.js"></script>
     <script>
         tailwind.config = {
@@ -54,7 +55,20 @@
 
     <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-8">
         <div class="flex items-center justify-between mb-4 md:mb-8">
-            <h1 id="page-title" class="text-xl md:text-2xl font-bold cursor-pointer hover:text-primary">KPH Makers Leaderboard - 2025 🏆</h1>
+            <h1 id="page-title" class="text-xl md:text-2xl font-bold cursor-pointer hover:text-primary">KPH Makers Stats - 2025 📊</h1>
+        </div>
+        
+        <!-- Daily Launches Chart -->
+        <div id="daily-chart-container" class="bg-white rounded-lg shadow-sm border border-gray-200 mb-8 hidden">
+            <div class="p-4 md:p-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-800">Daily Launches - Past Month</h2>
+                <p class="text-sm text-gray-500 mt-1">Number of products launched each day</p>
+            </div>
+            <div class="p-4 md:p-6">
+                <div class="relative h-64 md:h-80">
+                    <canvas id="daily-launches-chart"></canvas>
+                </div>
+            </div>
         </div>
         
         <!-- Stats Overview -->
@@ -103,6 +117,6 @@
         </div>
     </div>
 
-    <script src="leaderboard.js"></script>
+    <script src="stats.js"></script>
 </body>
-</html> 
+</html>

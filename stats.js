@@ -16,18 +16,26 @@ document.addEventListener('DOMContentLoaded', function () {
   const tabSwitcherEl = document.querySelector(
     '.flex.border-b.border-gray-200.mb-6'
   );
+  const dailyChartContainerEl = document.getElementById(
+    'daily-chart-container'
+  );
+  const dailyChartEl = document.getElementById('daily-launches-chart');
 
   let allProducts = [];
   let allMakers = [];
   let recentMakers = [];
   let currentTab = 'most-launches';
+  let dailyChart = null;
 
-  // Hide leaderboard and tab switcher initially while loading
+  // Hide leaderboard, tab switcher, and chart initially while loading
   if (fullLeaderboardEl) {
     fullLeaderboardEl.style.display = 'none';
   }
   if (tabSwitcherEl) {
     tabSwitcherEl.style.display = 'none';
+  }
+  if (dailyChartContainerEl) {
+    dailyChartContainerEl.style.display = 'none';
   }
 
   // Function to clear search
@@ -107,6 +115,153 @@ document.addEventListener('DOMContentLoaded', function () {
         count: makerCounts[maker],
         lastLaunchDate: lastLaunchDate,
       }));
+  }
+
+  // Function to calculate daily launches for the past month
+  function calculateDailyLaunches(products) {
+    const today = new Date();
+    const oneMonthAgo = new Date(today);
+    oneMonthAgo.setMonth(today.getMonth() - 1);
+
+    // Create a map to count launches per day
+    const dailyCounts = {};
+
+    products.forEach((product) => {
+      const dateStr = product['Date'];
+      if (dateStr) {
+        const launchDate = new Date(dateStr);
+        if (launchDate >= oneMonthAgo && launchDate <= today) {
+          const dateKey = launchDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+          dailyCounts[dateKey] = (dailyCounts[dateKey] || 0) + 1;
+        }
+      }
+    });
+
+    // Generate all dates in the range and fill in missing dates with 0
+    const result = [];
+    const currentDate = new Date(oneMonthAgo);
+
+    while (currentDate <= today) {
+      const dateKey = currentDate.toISOString().split('T')[0];
+      result.push({
+        date: dateKey,
+        count: dailyCounts[dateKey] || 0,
+      });
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return result;
+  }
+
+  // Function to create and render the daily launches chart
+  function renderDailyChart(dailyData) {
+    if (!dailyChartEl || !dailyData || dailyData.length === 0) return;
+
+    // Destroy existing chart if it exists
+    if (dailyChart) {
+      dailyChart.destroy();
+    }
+
+    const ctx = dailyChartEl.getContext('2d');
+
+    // Prepare data for Chart.js
+    const labels = dailyData.map((item) => {
+      const date = new Date(item.date);
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+      });
+    });
+
+    const data = dailyData.map((item) => item.count);
+
+    dailyChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Daily Launches',
+            data: data,
+            borderColor: '#ff6154',
+            backgroundColor: 'rgba(255, 97, 84, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: '#ff6154',
+            pointBorderColor: '#ff6154',
+            pointRadius: 2,
+            pointHoverRadius: 4,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            callbacks: {
+              title: function (context) {
+                const dataIndex = context[0].dataIndex;
+                const date = new Date(dailyData[dataIndex].date);
+                return date.toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                });
+              },
+              label: function (context) {
+                const count = context.parsed.y;
+                return `${count} launch${count !== 1 ? 'es' : ''}`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            display: true,
+            grid: {
+              display: false,
+            },
+            ticks: {
+              maxTicksLimit: 6,
+              color: '#9CA3AF',
+            },
+          },
+          y: {
+            beginAtZero: true,
+            display: false,
+            grid: {
+              display: true,
+              color: 'rgba(0, 0, 0, 0.1)',
+              borderDash: [5, 5],
+            },
+            ticks: {
+              display: false,
+            },
+          },
+        },
+        interaction: {
+          mode: 'nearest',
+          axis: 'x',
+          intersect: false,
+        },
+      },
+    });
+
+    // Show the chart container
+    if (dailyChartContainerEl) {
+      dailyChartContainerEl.style.display = 'block';
+    }
   }
 
   // Function to switch tabs
@@ -331,6 +486,9 @@ document.addEventListener('DOMContentLoaded', function () {
         allMakers = calculateAllMakers(allProducts);
         recentMakers = calculateRecentMakers(allProducts);
 
+        // Calculate daily launches data
+        const dailyLaunchesData = calculateDailyLaunches(allProducts);
+
         // Show leaderboard and tab switcher after data is loaded
         if (fullLeaderboardEl) {
           fullLeaderboardEl.style.display = 'block';
@@ -338,6 +496,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (tabSwitcherEl) {
           tabSwitcherEl.style.display = 'flex';
         }
+
+        // Render daily chart
+        renderDailyChart(dailyLaunchesData);
 
         // Render stats overview
         renderStats(allMakers, allProducts.length);
