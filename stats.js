@@ -117,37 +117,106 @@ document.addEventListener('DOMContentLoaded', function () {
       }));
   }
 
-  // Function to calculate daily launches for the past month
+  // Function to calculate daily launches for current and previous month comparison
   function calculateDailyLaunches(products) {
     const today = new Date();
-    const oneMonthAgo = new Date(today);
-    oneMonthAgo.setMonth(today.getMonth() - 1);
+    const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1); // First day of current month
+    const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1); // First day of next month
+    const previousMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() - 1,
+      1
+    ); // First day of previous month
 
-    // Create a map to count launches per day
-    const dailyCounts = {};
+    // Create maps to count launches per day for both months
+    const currentMonthCounts = {};
+    const previousMonthCounts = {};
 
     products.forEach((product) => {
       const dateStr = product['Date'];
       if (dateStr) {
         const launchDate = new Date(dateStr);
-        if (launchDate >= oneMonthAgo && launchDate <= today) {
-          const dateKey = launchDate.toISOString().split('T')[0]; // YYYY-MM-DD format
-          dailyCounts[dateKey] = (dailyCounts[dateKey] || 0) + 1;
+        const dateKey = launchDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+
+        // Current month data (from first day of current month to end of current month)
+        if (launchDate >= currentMonth && launchDate < nextMonth) {
+          currentMonthCounts[dateKey] = (currentMonthCounts[dateKey] || 0) + 1;
+        }
+
+        // Previous month data (from first day of previous month to end of previous month)
+        if (launchDate >= previousMonth && launchDate < currentMonth) {
+          previousMonthCounts[dateKey] =
+            (previousMonthCounts[dateKey] || 0) + 1;
         }
       }
     });
 
-    // Generate all dates in the range and fill in missing dates with 0
-    const result = [];
-    const currentDate = new Date(oneMonthAgo);
+    // Generate all dates for current month and align with previous month days
+    const result = {
+      currentMonth: [],
+      previousMonth: [],
+    };
 
-    while (currentDate <= today) {
-      const dateKey = currentDate.toISOString().split('T')[0];
-      result.push({
-        date: dateKey,
-        count: dailyCounts[dateKey] || 0,
-      });
-      currentDate.setDate(currentDate.getDate() + 1);
+    const currentDate = new Date(currentMonth);
+    const daysInCurrentMonth = new Date(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth() + 1,
+      0
+    ).getDate();
+    const daysInPreviousMonth = new Date(
+      previousMonth.getFullYear(),
+      previousMonth.getMonth() + 1,
+      0
+    ).getDate();
+    const maxDayInMonth = Math.max(daysInCurrentMonth, daysInPreviousMonth);
+
+    // Generate data for comparison (full months)
+    for (let day = 1; day <= maxDayInMonth; day++) {
+      // Current month date (only if day exists in current month)
+      if (day <= daysInCurrentMonth) {
+        const currentDateKey = new Date(
+          currentMonth.getFullYear(),
+          currentMonth.getMonth(),
+          day
+        )
+          .toISOString()
+          .split('T')[0];
+        result.currentMonth.push({
+          date: currentDateKey,
+          count: currentMonthCounts[currentDateKey] || 0,
+          dayOfMonth: day,
+        });
+      } else {
+        // Add null for days that don't exist in current month
+        result.currentMonth.push({
+          date: null,
+          count: null,
+          dayOfMonth: day,
+        });
+      }
+
+      // Previous month date (only if day exists in previous month)
+      if (day <= daysInPreviousMonth) {
+        const previousDateKey = new Date(
+          previousMonth.getFullYear(),
+          previousMonth.getMonth(),
+          day
+        )
+          .toISOString()
+          .split('T')[0];
+        result.previousMonth.push({
+          date: previousDateKey,
+          count: previousMonthCounts[previousDateKey] || 0,
+          dayOfMonth: day,
+        });
+      } else {
+        // Add null for days that don't exist in previous month
+        result.previousMonth.push({
+          date: null,
+          count: null,
+          dayOfMonth: day,
+        });
+      }
     }
 
     return result;
@@ -155,7 +224,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Function to create and render the daily launches chart
   function renderDailyChart(dailyData) {
-    if (!dailyChartEl || !dailyData || dailyData.length === 0) return;
+    if (
+      !dailyChartEl ||
+      !dailyData ||
+      !dailyData.currentMonth ||
+      dailyData.currentMonth.length === 0
+    )
+      return;
 
     // Destroy existing chart if it exists
     if (dailyChart) {
@@ -164,16 +239,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const ctx = dailyChartEl.getContext('2d');
 
-    // Prepare data for Chart.js
-    const labels = dailyData.map((item) => {
-      const date = new Date(item.date);
-      return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-      });
+    // Prepare data for Chart.js - use day of month for labels
+    const labels = dailyData.currentMonth.map((item) => {
+      return item.dayOfMonth.toString();
     });
 
-    const data = dailyData.map((item) => item.count);
+    const currentMonthData = dailyData.currentMonth.map((item) => item.count);
+    const previousMonthData = dailyData.previousMonth.map((item) => item.count);
+
+    // Get month names for legend - use the current date to ensure we show the right month
+    const today = new Date();
+    const currentMonthName = today.toLocaleDateString('en-US', {
+      month: 'long',
+    });
+    const previousMonthDate = new Date(
+      today.getFullYear(),
+      today.getMonth() - 1,
+      1
+    );
+    const previousMonthName = previousMonthDate.toLocaleDateString('en-US', {
+      month: 'long',
+    });
 
     dailyChart = new Chart(ctx, {
       type: 'line',
@@ -181,8 +267,8 @@ document.addEventListener('DOMContentLoaded', function () {
         labels: labels,
         datasets: [
           {
-            label: 'Daily Launches',
-            data: data,
+            label: `${currentMonthName} (This Month)`,
+            data: currentMonthData,
             borderColor: '#ff6154',
             backgroundColor: 'rgba(255, 97, 84, 0.1)',
             borderWidth: 2,
@@ -193,6 +279,20 @@ document.addEventListener('DOMContentLoaded', function () {
             pointRadius: 2,
             pointHoverRadius: 4,
           },
+          {
+            label: `${previousMonthName} (Previous Month)`,
+            data: previousMonthData,
+            borderColor: '#9CA3AF',
+            backgroundColor: 'transparent',
+            borderWidth: 2,
+            borderDash: [5, 5],
+            fill: false,
+            tension: 0.4,
+            pointBackgroundColor: '#9CA3AF',
+            pointBorderColor: '#9CA3AF',
+            pointRadius: 1,
+            pointHoverRadius: 3,
+          },
         ],
       },
       options: {
@@ -200,7 +300,20 @@ document.addEventListener('DOMContentLoaded', function () {
         maintainAspectRatio: false,
         plugins: {
           legend: {
-            display: false,
+            display: true,
+            position: 'top',
+            align: 'end',
+            labels: {
+              boxWidth: 12,
+              boxHeight: 2,
+              useBorderRadius: true,
+              borderRadius: 1,
+              color: '#6B7280',
+              font: {
+                size: 12,
+              },
+              padding: 15,
+            },
           },
           tooltip: {
             mode: 'index',
@@ -210,18 +323,39 @@ document.addEventListener('DOMContentLoaded', function () {
             bodyColor: '#fff',
             callbacks: {
               title: function (context) {
-                const dataIndex = context[0].dataIndex;
-                const date = new Date(dailyData[dataIndex].date);
-                return date.toLocaleDateString('en-US', {
-                  weekday: 'long',
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric',
-                });
+                // Return empty string to hide the title
+                return '';
               },
               label: function (context) {
                 const count = context.parsed.y;
-                return `${count} launch${count !== 1 ? 'es' : ''}`;
+                const dataIndex = context.dataIndex;
+
+                // Get the actual date for this specific dataset
+                let actualDate;
+                if (context.datasetIndex === 0) {
+                  // Current month dataset
+                  actualDate = dailyData.currentMonth[dataIndex]?.date;
+                } else {
+                  // Previous month dataset
+                  actualDate = dailyData.previousMonth[dataIndex]?.date;
+                }
+
+                // Format just the date and count, no dataset label
+                if (actualDate) {
+                  const date = new Date(actualDate);
+                  const dateStr = date.toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                  });
+                  return `${dateStr}: ${count} launch${
+                    count !== 1 ? 'es' : ''
+                  }`;
+                }
+
+                // Fallback if no date available
+                return `Day ${
+                  dailyData.currentMonth[dataIndex].dayOfMonth
+                }: ${count} launch${count !== 1 ? 'es' : ''}`;
               },
             },
           },
@@ -233,8 +367,27 @@ document.addEventListener('DOMContentLoaded', function () {
               display: false,
             },
             ticks: {
-              maxTicksLimit: 6,
+              maxTicksLimit: 8,
               color: '#9CA3AF',
+              callback: function (value, index, values) {
+                // Show every few days to avoid crowding
+                if (
+                  index % Math.ceil(values.length / 6) === 0 ||
+                  index === values.length - 1
+                ) {
+                  return this.getLabelForValue(value);
+                }
+                return '';
+              },
+            },
+            title: {
+              display: true,
+              text: 'Day of Month',
+              color: '#6B7280',
+              font: {
+                size: 11,
+              },
+              padding: 10,
             },
           },
           y: {
@@ -251,8 +404,7 @@ document.addEventListener('DOMContentLoaded', function () {
           },
         },
         interaction: {
-          mode: 'nearest',
-          axis: 'x',
+          mode: 'index',
           intersect: false,
         },
       },
