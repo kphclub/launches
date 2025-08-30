@@ -313,10 +313,10 @@ document.addEventListener('DOMContentLoaded', function () {
         // Store all products (removed slice to show all)
         allProducts = data.data;
 
-        // Update the main heading with total count
-        const mainHeading = document.querySelector('h1');
-        if (mainHeading) {
-          mainHeading.innerHTML = `KPH Product Launches - 2025 🚀 <span class="text-sm font-normal text-gray-500">(${allProducts.length})</span>`;
+        // Update the stats button with total count
+        const statsButton = document.getElementById('stats-button');
+        if (statsButton) {
+          statsButton.innerHTML = `📊 View Launch Stats (${allProducts.length} products)`;
         }
 
         // If hash search was found on page load, filter products now
