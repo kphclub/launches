@@ -167,7 +167,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     projects.forEach((project, index) => {
       const rank = index + 1;
+      const fullUrl =
+        project.link && !project.link.startsWith('http')
+          ? 'https://' + project.link
+          : project.link;
       const domain = extractDomain(project.link);
+      console.log(domain);
+      console.log(fullUrl);
+      console.log(project.link);
       const formattedDate = formatDate(project.created_at);
       const isVoted = votedProjects.has(project.message_id);
       const reactionCount = project.reactionCount || 0;
@@ -182,12 +189,12 @@ document.addEventListener('DOMContentLoaded', function () {
         project.message_id
       }', event)"></div>
                          <div class="title">
-                             <a href="${project.link}" target="_blank">${
+                             <a href="${fullUrl}" target="_blank">${
         project.name
       }</a>
                              ${
                                domain
-                                 ? `<span class="domain">(<a href="${project.link}" target="_blank">${domain}</a>)</span>`
+                                 ? `<span class="domain">(<a href="${fullUrl}" target="_blank">${domain}</a>)</span>`
                                  : ''
                              }
                          </div>
