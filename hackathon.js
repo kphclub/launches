@@ -181,24 +181,25 @@ document.addEventListener('DOMContentLoaded', function () {
                         }" onclick="handleVote('${
         project.message_id
       }', event)"></div>
-                        <div class="title">
-                            <a href="${project.link}" target="_blank">${
+                         <div class="title">
+                             <a href="${project.link}" target="_blank">${
         project.name
       }</a>
-                            ${
-                              domain
-                                ? `<span class="domain">(<a href="${project.link}" target="_blank">${domain}</a>)</span>`
-                                : ''
-                            }
-                        </div>
+                             ${
+                               domain
+                                 ? `<span class="domain">(<a href="${project.link}" target="_blank">${domain}</a>)</span>`
+                                 : ''
+                             }
+                         </div>
                     </div>
+                    <div class="description">${project.description || ''}</div>
                     <div class="subtext">
-                        <span class="reactions">${reactionCount} reaction${
-        reactionCount === 1 ? '' : 's'
-      }</span>
                         by <strong>${project.memberName}</strong>
                         ${formattedDate} |
-                         <a href="#" class="toggle-comments" onclick="toggleComments('${
+                        ${reactionCount} reaction${
+        reactionCount === 1 ? '' : 's'
+      } |
+                         <a href="#" class="toggle-comments feedback-link" onclick="toggleComments('${
                            project.message_id
                          }', event)">${
         project.replyCount ? `${project.replyCount} feedback` : 'feedback'
