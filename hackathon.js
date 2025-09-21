@@ -210,9 +210,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         ${reactionCount} reaction${
         reactionCount === 1 ? '' : 's'
       } |
-                         <a href="feedback.html?id=${
+                         <a href="#" class="toggle-comments feedback-link" onclick="toggleComments('${
                            project.message_id
-                         }" class="feedback-link">${
+                         }', event)">${
         project.replyCount ? `${project.replyCount} feedback` : 'feedback'
       }</a>
                     </div>
@@ -295,8 +295,83 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  // Toggle comments visibility
+  function toggleComments(messageId, event) {
+    event.preventDefault();
+
+    const commentsSection = document.getElementById(`comments-${messageId}`);
+    const toggleLink = event.target;
+
+    if (
+      commentsSection.style.display === 'none' ||
+      commentsSection.style.display === ''
+    ) {
+      // Load and show comments
+      loadComments(messageId, commentsSection, toggleLink);
+    } else {
+      // Hide comments
+      commentsSection.style.display = 'none';
+      toggleLink.textContent = toggleLink.textContent.replace(
+        'hide',
+        'feedback'
+      );
+    }
+  }
+
+  // Load comments for a project
+  function loadComments(messageId, commentsSection, toggleLink) {
+    toggleLink.textContent = 'loading...';
+
+    fetch(`${repliesApiUrl}/${messageId}`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to load comments');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.replies && data.replies.length > 0) {
+          renderComments(data.replies, commentsSection);
+          commentsSection.style.display = 'block';
+          toggleLink.textContent = `hide (${data.replies.length})`;
+        } else {
+          commentsSection.innerHTML =
+            '<div class="comment">No feedback yet.</div>';
+          commentsSection.style.display = 'block';
+          toggleLink.textContent = 'hide';
+        }
+      })
+      .catch((error) => {
+        console.error('Error loading comments:', error);
+        commentsSection.innerHTML =
+          '<div class="comment" style="color: #ff6600;">Failed to load feedback.</div>';
+        commentsSection.style.display = 'block';
+        toggleLink.textContent = 'hide';
+      });
+  }
+
+  // Render comments
+  function renderComments(replies, commentsSection) {
+    let html = '';
+
+    replies.forEach((reply) => {
+      const formattedDate = formatDate(reply.created_at);
+
+      html += `
+        <div class="comment">
+          <div class="comment-author">${reply.memberName}</div>
+          <div class="comment-date">${formattedDate}</div>
+          <div class="comment-text">${reply.message}</div>
+        </div>
+      `;
+    });
+
+    commentsSection.innerHTML = html;
+  }
+
   // Make functions globally available
   window.handleVote = handleVote;
+  window.toggleComments = toggleComments;
 
   // Fetch hackathon projects
   function fetchProjects(showLoading = true) {
