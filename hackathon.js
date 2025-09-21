@@ -7,9 +7,13 @@ document.addEventListener('DOMContentLoaded', function () {
   const loadingEl = document.getElementById('loading');
   const errorEl = document.getElementById('error');
   const homeLink = document.getElementById('home-link');
+  const autoRefreshCheckbox = document.getElementById('auto-refresh-checkbox');
+  const refreshStatusEl = document.getElementById('refresh-status');
 
   let allProjects = [];
   let votedProjects = new Set();
+  let refreshInterval = null;
+  const REFRESH_INTERVAL_MS = 10000; // 10 seconds
 
   // Load voted projects from localStorage
   function loadVotedProjects() {
@@ -167,14 +171,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     projects.forEach((project, index) => {
       const rank = index + 1;
+      const hasLink = project.link && project.link.trim() !== '';
       const fullUrl =
-        project.link && !project.link.startsWith('http')
+        hasLink && !project.link.startsWith('http')
           ? 'https://' + project.link
           : project.link;
-      const domain = extractDomain(project.link);
-      console.log(domain);
-      console.log(fullUrl);
-      console.log(project.link);
+      const domain = hasLink ? extractDomain(project.link) : '';
       const formattedDate = formatDate(project.created_at);
       const isVoted = votedProjects.has(project.message_id);
       const reactionCount = project.reactionCount || 0;
@@ -189,9 +191,11 @@ document.addEventListener('DOMContentLoaded', function () {
         project.message_id
       }', event)"></div>
                          <div class="title">
-                             <a href="${fullUrl}" target="_blank">${
-        project.name
-      }</a>
+                             ${
+                               hasLink
+                                 ? `<a href="${fullUrl}" target="_blank">${project.name}</a>`
+                                 : `<span>${project.name}</span>`
+                             }
                              ${
                                domain
                                  ? `<span class="domain">(<a href="${fullUrl}" target="_blank">${domain}</a>)</span>`
@@ -206,9 +210,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         ${reactionCount} reaction${
         reactionCount === 1 ? '' : 's'
       } |
-                         <a href="#" class="toggle-comments feedback-link" onclick="toggleComments('${
+                         <a href="feedback.html?id=${
                            project.message_id
-                         }', event)">${
+                         }" class="feedback-link">${
         project.replyCount ? `${project.replyCount} feedback` : 'feedback'
       }</a>
                     </div>
@@ -231,34 +235,121 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  // Auto-refresh functionality
+  function startAutoRefresh() {
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+    }
+
+    refreshInterval = setInterval(() => {
+      refreshStatusEl.textContent = 'Refreshing...';
+      fetchProjects(false); // Silent refresh without showing loading
+    }, REFRESH_INTERVAL_MS);
+
+    updateRefreshStatus();
+  }
+
+  function stopAutoRefresh() {
+    if (refreshInterval) {
+      clearInterval(refreshInterval);
+      refreshInterval = null;
+    }
+    refreshStatusEl.textContent = '';
+  }
+
+  function updateRefreshStatus() {
+    if (refreshInterval) {
+      let countdown = REFRESH_INTERVAL_MS / 1000;
+      const countdownInterval = setInterval(() => {
+        countdown--;
+        if (countdown <= 0 || !refreshInterval) {
+          clearInterval(countdownInterval);
+          if (refreshInterval) {
+            refreshStatusEl.textContent = 'Refreshing...';
+          }
+        } else {
+          refreshStatusEl.textContent = `Next refresh in ${countdown}s`;
+        }
+      }, 1000);
+    }
+  }
+
+  // Auto-refresh checkbox handler
+  if (autoRefreshCheckbox) {
+    autoRefreshCheckbox.addEventListener('change', function () {
+      if (this.checked) {
+        startAutoRefresh();
+      } else {
+        stopAutoRefresh();
+      }
+
+      // Save preference
+      localStorage.setItem('kph-hackathon-auto-refresh', this.checked);
+    });
+
+    // Load saved preference
+    const savedPreference = localStorage.getItem('kph-hackathon-auto-refresh');
+    if (savedPreference === 'true') {
+      autoRefreshCheckbox.checked = true;
+      startAutoRefresh();
+    }
+  }
+
   // Make functions globally available
   window.handleVote = handleVote;
-  window.toggleComments = toggleComments;
+
+  // Fetch hackathon projects
+  function fetchProjects(showLoading = true) {
+    if (showLoading) {
+      loadingEl.style.display = 'block';
+      errorEl.style.display = 'none';
+    }
+
+    return fetch(hackathonApiUrl)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (showLoading) {
+          loadingEl.style.display = 'none';
+        }
+
+        if (data.launches && Array.isArray(data.launches)) {
+          allProjects = data.launches;
+          renderProjects(allProjects);
+
+          // Update refresh status on successful refresh
+          if (!showLoading && refreshInterval) {
+            refreshStatusEl.textContent = 'Updated just now';
+            updateRefreshStatus();
+          }
+        } else {
+          throw new Error('Invalid data format');
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching hackathon data:', error);
+        if (showLoading) {
+          loadingEl.style.display = 'none';
+          errorEl.style.display = 'block';
+        } else {
+          // Silent refresh failed
+          refreshStatusEl.textContent = 'Refresh failed';
+          setTimeout(() => {
+            if (refreshInterval) {
+              updateRefreshStatus();
+            }
+          }, 2000);
+        }
+      });
+  }
 
   // Load initial data
   loadVotedProjects();
 
-  // Fetch hackathon projects
-  fetch(hackathonApiUrl)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then((data) => {
-      loadingEl.style.display = 'none';
-
-      if (data.launches && Array.isArray(data.launches)) {
-        allProjects = data.launches;
-        renderProjects(allProjects);
-      } else {
-        throw new Error('Invalid data format');
-      }
-    })
-    .catch((error) => {
-      console.error('Error fetching hackathon data:', error);
-      loadingEl.style.display = 'none';
-      errorEl.style.display = 'block';
-    });
+  // Initial fetch
+  fetchProjects(true);
 });

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Feedback | KPH Hackathon</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" type="image/png" href="https://kph.club/favicon.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Verdana:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: Verdana, Geneva, sans-serif;
+            font-size: 14px;
+            background-color: #f6f6ef;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .header {
+            background-color: #ff6600;
+            padding: 2px;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            padding: 4px;
+        }
+        
+        .header-title {
+            font-weight: bold;
+            color: black;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        
+        .header-nav {
+            color: black;
+            text-decoration: none;
+            margin-right: 10px;
+            font-size: 12px;
+        }
+        
+        .header-nav:hover {
+            text-decoration: underline;
+        }
+        
+        .content {
+            background-color: #f6f6ef;
+            padding: 8px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .project-header {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e6e6df;
+        }
+        
+        .project-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .project-title a {
+            color: black;
+            text-decoration: none;
+        }
+        
+        .project-title a:hover {
+            text-decoration: underline;
+        }
+        
+        .project-domain {
+            color: #828282;
+            font-size: 14px;
+            margin-left: 4px;
+        }
+        
+        .project-description {
+            color: #828282;
+            font-size: 14px;
+            margin: 8px 0;
+            line-height: 1.4;
+        }
+        
+        .project-meta {
+            color: #828282;
+            font-size: 12px;
+            margin-top: 8px;
+        }
+        
+        .project-meta a {
+            color: #828282;
+            text-decoration: none;
+        }
+        
+        .project-meta a:hover {
+            text-decoration: underline;
+        }
+        
+        .comments-header {
+            font-size: 14px;
+            font-weight: bold;
+            margin: 20px 0 15px 0;
+            color: black;
+        }
+        
+        .comment {
+            margin-bottom: 15px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .comment:last-child {
+            border-bottom: none;
+        }
+        
+        .comment-header {
+            font-size: 12px;
+            color: #828282;
+            margin-bottom: 5px;
+        }
+        
+        .comment-author {
+            color: #3c963c;
+            font-weight: bold;
+        }
+        
+        .comment-date {
+            color: #828282;
+        }
+        
+        .comment-text {
+            font-size: 14px;
+            line-height: 1.4;
+            color: black;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #828282;
+            padding: 40px 20px;
+            font-size: 14px;
+        }
+        
+        .error {
+            text-align: center;
+            color: #ff6600;
+            padding: 40px 20px;
+            font-size: 14px;
+        }
+        
+        .no-comments {
+            text-align: center;
+            color: #828282;
+            padding: 40px 20px;
+            font-size: 14px;
+            font-style: italic;
+        }
+        
+        .back-link {
+            color: #828282;
+            text-decoration: none;
+            font-size: 12px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .reactions {
+            color: #ff6600;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                padding: 8px 12px;
+            }
+            
+            .project-title {
+                font-size: 15px;
+            }
+            
+            .project-description {
+                font-size: 13px;
+            }
+            
+            .project-meta {
+                font-size: 11px;
+            }
+            
+            .comment-text {
+                font-size: 13px;
+            }
+            
+            .comment-header {
+                font-size: 11px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header-nav {
+                display: none;
+            }
+            
+            .content {
+                padding: 8px 8px;
+            }
+            
+            .project-title {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <a href="hackathon.html" class="header-title">KPH Hackathon 2025</a>
+            <a href="index.html" class="header-nav">launches</a>
+            <a href="https://news.kph.club" class="header-nav">news</a>
+            <a href="https://join.kph.club" class="header-nav">join</a>
+        </div>
+    </div>
+    
+    <div class="content">
+        <a href="hackathon.html" class="back-link">← back to hackathon</a>
+        
+        <div id="loading" class="loading">Loading project and feedback...</div>
+        
+        <div id="error" class="error" style="display: none;">
+            Failed to load project details. Please try again later.
+        </div>
+        
+        <div id="project-content" style="display: none;">
+            <div class="project-header">
+                <div class="project-title">
+                    <a href="#" target="_blank" id="project-link">
+                        <span id="project-name">Project Name</span>
+                    </a>
+                    <span class="project-domain" id="project-domain"></span>
+                </div>
+                <div class="project-description" id="project-description">Project description will appear here</div>
+                <div class="project-meta">
+                    by <strong id="project-author">Author</strong>
+                    <span id="project-date">date</span> |
+                    <span class="reactions" id="project-reactions">0 reactions</span>
+                </div>
+            </div>
+            
+            <div class="comments-header" id="comments-header">Feedback</div>
+            <div id="comments-list"></div>
+        </div>
+    </div>
+
+    <script src="feedback.js"></script>
+</body>
+</html>
+
