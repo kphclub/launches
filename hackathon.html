@@ -84,21 +84,6 @@
             font-size: 9pt;
         }
         
-        .vote {
-            width: 10px;
-            margin-right: 5px;
-            cursor: pointer;
-        }
-        
-        .vote::before {
-            content: "▲";
-            color: #828282;
-            font-size: 8pt;
-        }
-        
-        .vote.voted::before {
-            color: #ff6600;
-        }
         
         .title {
             font-size: 14px;
@@ -282,10 +267,6 @@
                 margin-right: 3px;
             }
             
-            .vote {
-                width: 8px;
-                margin-right: 3px;
-            }
             
             .title {
                 font-size: 14px;
@@ -389,14 +370,6 @@
     </div>
     
     <div class="content">
-        <div class="auto-refresh-controls" style="margin-bottom: 15px; padding: 8px; background: #fff; border: 1px solid #e6e6df; border-radius: 3px;">
-            <label style="font-size: 12px; color: #828282; cursor: pointer;">
-                <input type="checkbox" id="auto-refresh-checkbox" style="margin-right: 6px;"> 
-                Auto-refresh projects every 10 seconds
-            </label>
-            <span id="refresh-status" style="margin-left: 15px; font-size: 11px; color: #828282;"></span>
-        </div>
-        
         <div id="loading" class="loading">Loading hackathon projects...</div>
         <div id="error" class="error" style="display: none;">
             Failed to load hackathon projects. Please try again later.

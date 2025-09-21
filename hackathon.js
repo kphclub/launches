@@ -7,46 +7,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const loadingEl = document.getElementById('loading');
   const errorEl = document.getElementById('error');
   const homeLink = document.getElementById('home-link');
-  const autoRefreshCheckbox = document.getElementById('auto-refresh-checkbox');
-  const refreshStatusEl = document.getElementById('refresh-status');
 
   let allProjects = [];
-  let votedProjects = new Set();
-  let refreshInterval = null;
-  const REFRESH_INTERVAL_MS = 10000; // 10 seconds
-
-  // Load voted projects from localStorage
-  function loadVotedProjects() {
-    const stored = localStorage.getItem('kph-hackathon-votes');
-    if (stored) {
-      votedProjects = new Set(JSON.parse(stored));
-    }
-  }
-
-  // Save voted projects to localStorage
-  function saveVotedProjects() {
-    localStorage.setItem(
-      'kph-hackathon-votes',
-      JSON.stringify([...votedProjects])
-    );
-  }
-
-  // Handle vote click
-  function handleVote(messageId, event) {
-    event.preventDefault();
-    event.stopPropagation();
-
-    const voteEl = event.target;
-    if (votedProjects.has(messageId)) {
-      votedProjects.delete(messageId);
-      voteEl.classList.remove('voted');
-    } else {
-      votedProjects.add(messageId);
-      voteEl.classList.add('voted');
-    }
-
-    saveVotedProjects();
-  }
 
   // Extract domain from URL
   function extractDomain(url) {
@@ -178,18 +140,12 @@ document.addEventListener('DOMContentLoaded', function () {
           : project.link;
       const domain = hasLink ? extractDomain(project.link) : '';
       const formattedDate = formatDate(project.created_at);
-      const isVoted = votedProjects.has(project.message_id);
       const reactionCount = project.reactionCount || 0;
 
       html += `
                 <div class="item">
                     <div class="item-line">
                         <div class="rank">${rank}.</div>
-                        <div class="vote ${
-                          isVoted ? 'voted' : ''
-                        }" onclick="handleVote('${
-        project.message_id
-      }', event)"></div>
                          <div class="title">
                              ${
                                hasLink
@@ -233,66 +189,6 @@ document.addEventListener('DOMContentLoaded', function () {
       e.preventDefault();
       window.location.reload();
     });
-  }
-
-  // Auto-refresh functionality
-  function startAutoRefresh() {
-    if (refreshInterval) {
-      clearInterval(refreshInterval);
-    }
-
-    refreshInterval = setInterval(() => {
-      refreshStatusEl.textContent = 'Refreshing...';
-      fetchProjects(false); // Silent refresh without showing loading
-    }, REFRESH_INTERVAL_MS);
-
-    updateRefreshStatus();
-  }
-
-  function stopAutoRefresh() {
-    if (refreshInterval) {
-      clearInterval(refreshInterval);
-      refreshInterval = null;
-    }
-    refreshStatusEl.textContent = '';
-  }
-
-  function updateRefreshStatus() {
-    if (refreshInterval) {
-      let countdown = REFRESH_INTERVAL_MS / 1000;
-      const countdownInterval = setInterval(() => {
-        countdown--;
-        if (countdown <= 0 || !refreshInterval) {
-          clearInterval(countdownInterval);
-          if (refreshInterval) {
-            refreshStatusEl.textContent = 'Refreshing...';
-          }
-        } else {
-          refreshStatusEl.textContent = `Next refresh in ${countdown}s`;
-        }
-      }, 1000);
-    }
-  }
-
-  // Auto-refresh checkbox handler
-  if (autoRefreshCheckbox) {
-    autoRefreshCheckbox.addEventListener('change', function () {
-      if (this.checked) {
-        startAutoRefresh();
-      } else {
-        stopAutoRefresh();
-      }
-
-      // Save preference
-      localStorage.setItem('kph-hackathon-auto-refresh', this.checked);
-    });
-
-    // Load saved preference
-    const savedPreference = localStorage.getItem('kph-hackathon-auto-refresh');
-    if (savedPreference === 'true') {
-      autoRefreshCheckbox.checked = true;
-      startAutoRefresh();
-    }
   }
 
   // Toggle comments visibility
@@ -370,61 +266,29 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Make functions globally available
-  window.handleVote = handleVote;
   window.toggleComments = toggleComments;
 
   // Fetch hackathon projects
-  function fetchProjects(showLoading = true) {
-    if (showLoading) {
-      loadingEl.style.display = 'block';
-      errorEl.style.display = 'none';
-    }
+  fetch(hackathonApiUrl)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then((data) => {
+      loadingEl.style.display = 'none';
 
-    return fetch(hackathonApiUrl)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (showLoading) {
-          loadingEl.style.display = 'none';
-        }
-
-        if (data.launches && Array.isArray(data.launches)) {
-          allProjects = data.launches;
-          renderProjects(allProjects);
-
-          // Update refresh status on successful refresh
-          if (!showLoading && refreshInterval) {
-            refreshStatusEl.textContent = 'Updated just now';
-            updateRefreshStatus();
-          }
-        } else {
-          throw new Error('Invalid data format');
-        }
-      })
-      .catch((error) => {
-        console.error('Error fetching hackathon data:', error);
-        if (showLoading) {
-          loadingEl.style.display = 'none';
-          errorEl.style.display = 'block';
-        } else {
-          // Silent refresh failed
-          refreshStatusEl.textContent = 'Refresh failed';
-          setTimeout(() => {
-            if (refreshInterval) {
-              updateRefreshStatus();
-            }
-          }, 2000);
-        }
-      });
-  }
-
-  // Load initial data
-  loadVotedProjects();
-
-  // Initial fetch
-  fetchProjects(true);
+      if (data.launches && Array.isArray(data.launches)) {
+        allProjects = data.launches;
+        renderProjects(allProjects);
+      } else {
+        throw new Error('Invalid data format');
+      }
+    })
+    .catch((error) => {
+      console.error('Error fetching hackathon data:', error);
+      loadingEl.style.display = 'none';
+      errorEl.style.display = 'block';
+    });
 });
