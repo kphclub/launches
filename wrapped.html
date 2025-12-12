@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KPH 2025 Wrapped - Maker Community Stats</title>
+    
+    <!-- Open Graph / Social Sharing -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://launches.kph.club/wrapped">
+    <meta property="og:title" content="KPH 2025 Wrapped - Maker Community Stats">
+    <meta property="og:description" content="See how the KPH maker community shipped in 2025. Products launched, top builders, and more!">
+    <meta property="og:image" content="https://kph.club/og-wrapped.png">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <link rel="icon" type="image/png" href="https://kph.club/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer data-domain="launches.kph.club" src="https://record.micro.company/script.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'monospace'],
+                        sans: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#ff6154',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Hide scrollbar */
+        body {
+            overflow: hidden;
+            background: #0a0a0a;
+        }
+        
+        /* Card aspect ratio - Instagram story 9:16 */
+        .story-card {
+            aspect-ratio: 9 / 16;
+            max-height: 100vh;
+            max-height: 100dvh;
+        }
+        
+        /* Counter animation */
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-count {
+            animation: countUp 0.6s ease-out forwards;
+        }
+        
+        /* Card transitions */
+        .card-container {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+        }
+        
+        .card-container.hidden-left {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+        
+        .card-container.hidden-right {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        
+        .card-container.active {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        /* Progress bar animation */
+        .progress-fill {
+            transition: width 5s linear;
+        }
+        
+        /* Heatmap cell */
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 2px;
+        }
+        
+        /* Download button pulse */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .btn-pulse:hover {
+            animation: pulse 1s ease-in-out infinite;
+        }
+        
+        /* Gradient backgrounds for cards */
+        .gradient-hero { background: linear-gradient(135deg, #ff6154 0%, #ff8a65 50%, #ffab91 100%); }
+        .gradient-makers { background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 50%, #c4b5fd 100%); }
+        .gradient-busyday { background: linear-gradient(135deg, #059669 0%, #34d399 50%, #6ee7b7 100%); }
+        .gradient-weekday { background: linear-gradient(135deg, #dc2626 0%, #ef4444 50%, #f87171 100%); }
+        .gradient-leaderboard { background: linear-gradient(135deg, #2563eb 0%, #60a5fa 50%, #93c5fd 100%); }
+        .gradient-heatmap { background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%); }
+        .gradient-milestones { background: linear-gradient(135deg, #ea580c 0%, #fb923c 50%, #fdba74 100%); }
+        .gradient-streak { background: linear-gradient(135deg, #7c2d12 0%, #c2410c 50%, #ea580c 100%); }
+        .gradient-weekend { background: linear-gradient(135deg, #4c1d95 0%, #7c3aed 50%, #a78bfa 100%); }
+        .gradient-categories { background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); }
+        .gradient-ai { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%); }
+        
+        /* Bottom progress dots */
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-dot.completed {
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .progress-dot.active {
+            width: 24px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .progress-dot .dot-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: white;
+            border-radius: inherit;
+        }
+        
+        .progress-dot.active .dot-fill {
+            animation: dotFill var(--duration, 6s) linear forwards;
+        }
+        
+        .progress-dot.paused .dot-fill {
+            animation-play-state: paused;
+        }
+        
+        @keyframes dotFill {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-black text-white font-sans">
+    
+    <!-- Main Container -->
+    <div id="wrapped-container" class="relative w-full h-screen h-[100dvh] flex items-center justify-center bg-black overflow-hidden">
+        
+        <!-- Loading State -->
+        <div id="loading" class="absolute inset-0 flex items-center justify-center bg-black z-50">
+            <div class="text-center">
+                <div class="w-12 h-12 rounded-full border-4 border-white/20 border-t-primary animate-spin mb-4"></div>
+                <p class="text-white/60">Loading your wrapped...</p>
+            </div>
+        </div>
+        
+        <!-- Error State -->
+        <div id="error" class="absolute inset-0 flex items-center justify-center bg-black z-50 hidden">
+            <div class="text-center px-8">
+                <p class="text-2xl mb-4">😢</p>
+                <p class="text-white/80 mb-4">Failed to load stats</p>
+                <button onclick="location.reload()" class="px-4 py-2 bg-primary rounded-lg hover:bg-primary/80">Try Again</button>
+            </div>
+        </div>
+        
+        <!-- Story Progress Bar -->
+        <!-- Cards Wrapper -->
+        <div id="cards-wrapper" class="relative w-full h-full flex items-center justify-center">
+            
+            <!-- Card 1: Hero - Total Products -->
+            <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="0">
+                <div class="story-card w-full max-w-[430px] gradient-hero rounded-3xl overflow-hidden relative flex flex-col" id="card-0">
+                    <!-- KPH Branding -->
+                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
+                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
+                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="flex-1 flex flex-col items-center justify-center px-8 text-center">
+                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest">This Year</p>
+                        <div class="counter text-[8rem] md:text-[10rem] font-mono font-extrabold leading-none text-white" data-target="0" id="stat-total-products">0</div>
+                        <p class="text-white text-2xl md:text-3xl font-bold mt-4">Products Shipped</p>
+                        <p class="text-white/70 text-lg mt-2">by the KPH community</p>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <button class="share-btn absolute top-6 right-[4.5rem] w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                    </button>
+                    <button class="download-btn absolute top-6 right-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10" data-card-index="0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Card 2: Unique Makers -->
+            <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="1">
+                <div class="story-card w-full max-w-[430px] gradient-makers rounded-3xl overflow-hidden relative flex flex-col" id="card-1">
+                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
+                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
+                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    </div>
+                    
+                    <div class="flex-1 flex flex-col items-center justify-center px-8 text-center">
+                        <p class="text-6xl mb-6">👩‍💻👨‍💻</p>
+                        <div class="counter text-[7rem] md:text-[9rem] font-mono font-extrabold leading-none text-white" data-target="0" id="stat-total-makers">0</div>
+                        <p class="text-white text-2xl md:text-3xl font-bold mt-4">Unique Builders</p>
+                        <p class="text-white/70 text-lg mt-2">turned ideas into reality</p>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <button class="share-btn absolute top-6 right-[4.5rem] w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                    </button>
+                    <button class="download-btn absolute top-6 right-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10" data-card-index="1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Card 3: Busiest Month -->
+            <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="2">
+                <div class="story-card w-full max-w-[430px] gradient-busyday rounded-3xl overflow-hidden relative flex flex-col" id="card-2">
+                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
+                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
+                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    </div>
+                    
+                    <div class="flex-1 flex flex-col items-center justify-center px-8 text-center">
+                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest">The community went wild in</p>
+                        <p class="text-white text-4xl md:text-5xl font-bold mb-6" id="stat-busiest-month">Loading...</p>
+                        <div class="counter text-[6rem] md:text-[8rem] font-mono font-extrabold leading-none text-yellow-300" data-target="0" id="stat-busiest-count">0</div>
+                        <p class="text-white text-2xl font-bold mt-4">products shipped 🔥</p>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <button class="share-btn absolute top-6 right-[4.5rem] w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                    </button>
+                    <button class="download-btn absolute top-6 right-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10" data-card-index="2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Card 4: Favorite Weekday -->
+            <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="3">
+                <div class="story-card w-full max-w-[430px] gradient-weekday rounded-3xl overflow-hidden relative flex flex-col" id="card-3">
+                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
+                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
+                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    </div>
+                    
+                    <div class="flex-1 flex flex-col items-center justify-center px-8 text-center">
+                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest">Favorite shipping day</p>
+                        <p class="text-white text-5xl md:text-6xl font-extrabold mb-4" id="stat-favorite-day">Loading...</p>
+                        <p class="text-white/80 text-xl" id="stat-day-percentage">0% of all launches</p>
+                        
+                        <!-- Weekday bars -->
+                        <div class="w-full max-w-xs mt-8 space-y-2" id="weekday-bars">
+                            <!-- Generated by JS -->
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <button class="share-btn absolute top-6 right-[4.5rem] w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                    </button>
+                    <button class="download-btn absolute top-6 right-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10" data-card-index="3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Card 5: Top 5 Shippers -->
+            <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="4">
+                <div class="story-card w-full max-w-[430px] gradient-leaderboard rounded-3xl overflow-hidden relative flex flex-col" id="card-4">
+                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
+                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
+                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    </div>
+                    
+                    <div class="flex-1 flex flex-col items-center justify-center px-8 pt-14">
+                        <p class="text-4xl mb-4">🏆</p>
+                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest">Top Shippers</p>
+                        
+                        <div class="w-full max-w-sm space-y-2" id="top-shippers">
+                            <!-- Generated by JS -->
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <button class="share-btn absolute top-6 right-[4.5rem] w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                    </button>
+                    <button class="download-btn absolute top-6 right-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10" data-card-index="4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Card 6: Launch Heatmap -->
+            <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="5">
+                <div class="story-card w-full max-w-[430px] gradient-heatmap rounded-3xl overflow-hidden relative flex flex-col" id="card-5">
+                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
+                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
+                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    </div>
+                    
+                    <div class="flex-1 flex flex-col items-center justify-center px-2 pt-14">
+                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest">📅 Shipping Calendar</p>
+                        <p class="text-white/60 text-xs mb-2">Every day the community launched</p>
+                        
+                        <!-- GitHub-style heatmap -->
+                        <div class="flex justify-center items-center" id="github-heatmap">
+                            <!-- Generated by JS - 52 weeks with 7 days each -->
+                        </div>
+                        
+                        <!-- Legend -->
+                        <div class="flex items-center gap-2 mt-3 text-xs text-white/50">
+                            <span>Less</span>
+                            <div class="flex gap-0.5">
+                                <div class="w-2 h-2 rounded-sm bg-white/10"></div>
+                                <div class="w-2 h-2 rounded-sm bg-emerald-900"></div>
+                                <div class="w-2 h-2 rounded-sm bg-emerald-700"></div>
+                                <div class="w-2 h-2 rounded-sm bg-emerald-500"></div>
+                                <div class="w-2 h-2 rounded-sm bg-emerald-300"></div>
+                            </div>
+                            <span>More</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <button class="share-btn absolute top-6 right-[4.5rem] w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                    </button>
+                    <button class="download-btn absolute top-6 right-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10" data-card-index="5">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Card 7: Longest Shipping Streak -->
+            <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="6">
+                <div class="story-card w-full max-w-[430px] gradient-streak rounded-3xl overflow-hidden relative flex flex-col" id="card-6">
+                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
+                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
+                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    </div>
+                    
+                    <div class="flex-1 flex flex-col items-center justify-center px-8 text-center">
+                        <p class="text-5xl mb-4">🔥</p>
+                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest">Longest Shipping Streak</p>
+                        <div class="counter text-[6rem] md:text-[8rem] font-mono font-extrabold leading-none text-yellow-300" data-target="0" id="stat-streak">0</div>
+                        <p class="text-white text-2xl font-bold mt-4">consecutive days</p>
+                        <p class="text-white/60 text-sm mt-4" id="stat-streak-dates">Loading...</p>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <button class="share-btn absolute top-6 right-[4.5rem] w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                    </button>
+                    <button class="download-btn absolute top-6 right-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10" data-card-index="6">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Card 8: Weekend Warriors -->
+            <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="7">
+                <div class="story-card w-full max-w-[430px] gradient-weekend rounded-3xl overflow-hidden relative flex flex-col" id="card-7">
+                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
+                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
+                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    </div>
+                    
+                    <div class="flex-1 flex flex-col items-center justify-center px-8 text-center">
+                        <p class="text-5xl mb-4">🌙</p>
+                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest">Weekend Warriors</p>
+                        <div class="flex items-baseline justify-center gap-4">
+                            <span class="text-[4rem] md:text-[5rem] font-extrabold text-white">1</span>
+                            <span class="text-[2rem] md:text-[2.5rem] font-bold text-white/60">in</span>
+                            <span class="text-[4rem] md:text-[5rem] font-mono font-extrabold text-yellow-300" id="stat-weekend-ratio">4</span>
+                        </div>
+                        <p class="text-white text-xl font-bold mt-2">products shipped on weekends</p>
+                        <p class="text-white/60 text-lg mt-4" id="stat-weekend-count">X products on Sat & Sun</p>
+                        <p class="text-white/40 text-sm mt-2">Makers never sleep 💪</p>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <button class="share-btn absolute top-6 right-[4.5rem] w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                    </button>
+                    <button class="download-btn absolute top-6 right-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10" data-card-index="7">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Card 9: Category Breakdown -->
+            <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="8">
+                <div class="story-card w-full max-w-[430px] gradient-categories rounded-3xl overflow-hidden relative flex flex-col" id="card-8">
+                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
+                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
+                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    </div>
+                    
+                    <div class="flex-1 flex flex-col items-center justify-center px-8 pt-16">
+                        <p class="text-5xl mb-3">🚀</p>
+                        <p class="text-white/80 text-lg mb-6 uppercase tracking-widest" id="stat-top-category">What KPH Built</p>
+                        
+                        <!-- Category bars -->
+                        <div class="w-full max-w-md space-y-3" id="category-bars">
+                            <!-- Generated by JS -->
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <button class="share-btn absolute top-6 right-[4.5rem] w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                    </button>
+                    <button class="download-btn absolute top-6 right-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10" data-card-index="8">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Card 10: AI Spotlight -->
+            <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="9">
+                <div class="story-card w-full max-w-[430px] gradient-ai rounded-3xl overflow-hidden relative flex flex-col" id="card-9">
+                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
+                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
+                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    </div>
+                    
+                    <div class="flex-1 flex flex-col items-center justify-center px-6 pt-16">
+                        <p class="text-5xl mb-2">🤖</p>
+                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest">The AI Revolution</p>
+                        
+                        <!-- Big stat -->
+                        <div class="text-center mb-4">
+                            <div class="flex items-baseline justify-center gap-3">
+                                <span class="text-white text-5xl font-extrabold">1</span>
+                                <span class="text-white/60 text-2xl font-bold">in</span>
+                                <span class="text-yellow-300 text-5xl font-extrabold" id="stat-ai-ratio">3</span>
+                            </div>
+                            <p class="text-white/80 text-lg mt-2">products was AI-powered</p>
+                        </div>
+                        
+                        <!-- AI Monthly Trend Chart -->
+                        <div class="w-full bg-white/10 rounded-2xl p-4 mb-4">
+                            <p class="text-white/60 text-xs uppercase tracking-wider mb-3 text-center">AI launches per month</p>
+                            <div class="relative h-32">
+                                <canvas id="ai-trend-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- AI Count -->
+                        <p class="text-white/70 text-sm text-center">
+                            <span class="text-yellow-300 font-bold text-lg" id="stat-ai-count">57</span> AI products shipped this year
+                        </p>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <button class="share-btn absolute top-6 right-[4.5rem] w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="18" cy="5" r="3"></circle>
+                            <circle cx="6" cy="12" r="3"></circle>
+                            <circle cx="18" cy="19" r="3"></circle>
+                            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                            <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                        </svg>
+                    </button>
+                    <button class="download-btn absolute top-6 right-6 w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center hover:bg-white/30 transition z-10" data-card-index="9">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- Navigation -->
+        <div class="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 z-50">
+            <button id="prev-btn" class="w-10 h-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-white/20 transition disabled:opacity-30 disabled:cursor-not-allowed" disabled>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            
+            <!-- Progress dots -->
+            <div id="progress-dots" class="flex gap-2">
+                <!-- Generated by JS -->
+            </div>
+            
+            <button id="next-btn" class="w-10 h-10 rounded-full bg-white/10 backdrop-blur flex items-center justify-center hover:bg-white/20 transition disabled:opacity-30 disabled:cursor-not-allowed">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Back to stats link -->
+        <a href="stats.html" class="fixed top-6 right-6 text-white/50 hover:text-white text-sm flex items-center gap-1 z-50">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </a>
+        
+    </div>
+    
+    <!-- Toast notification -->
+    <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 px-4 py-2 bg-white text-black rounded-full text-sm font-medium opacity-0 transition-opacity pointer-events-none z-50">
+        Link copied!
+    </div>
+
+    <script src="wrapped.js"></script>
+</body>
+</html>
+
