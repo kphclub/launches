@@ -116,7 +116,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Navigate to specific card
   function goToCard(index) {
-    if (index < 0 || index >= totalCards) return;
+    // Loop around for continuous navigation
+    if (index < 0) {
+      index = totalCards - 1;
+    } else if (index >= totalCards) {
+      index = 0;
+    }
 
     const cards = document.querySelectorAll('.card-container');
     currentCardIndex = index;
@@ -131,12 +136,14 @@ document.addEventListener('DOMContentLoaded', function () {
         card.classList.add('active');
         // Trigger counter animation for current card
         animateCounters(card);
+        // Reset and replay all animations on this card
+        resetAnimations(card);
       }
     });
 
-    // Update navigation buttons
-    prevBtn.disabled = currentCardIndex === 0;
-    nextBtn.disabled = currentCardIndex === totalCards - 1;
+    // Navigation buttons always enabled for looping
+    prevBtn.disabled = false;
+    nextBtn.disabled = false;
 
     updateProgressDots();
     startStoryTimer();
@@ -167,6 +174,19 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       requestAnimationFrame(updateCounter);
+    });
+  }
+
+  // Reset and replay animations on card
+  function resetAnimations(card) {
+    const animatedElements = card.querySelectorAll('.anim-element');
+    animatedElements.forEach((el) => {
+      // Get current animation classes
+      const classes = el.className;
+      // Force reflow by removing and re-adding animation classes
+      el.style.animation = 'none';
+      el.offsetHeight; // Trigger reflow
+      el.style.animation = '';
     });
   }
 
@@ -451,17 +471,18 @@ document.addEventListener('DOMContentLoaded', function () {
       const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
       const maxCount = Math.max(...Object.values(stats.weekdayCounts));
       weekdayBarsEl.innerHTML = weekdays
-        .map((day) => {
+        .map((day, index) => {
           const count = stats.weekdayCounts[day] || 0;
           const width = maxCount > 0 ? (count / maxCount) * 100 : 0;
           const isMax = count === maxCount && count > 0;
+          const delay = 0.1 * index;
           return `
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 anim-element animate-fade-up" style="animation-delay: ${delay}s">
             <span class="w-8 text-xs text-white/60">${day}</span>
             <div class="flex-1 h-4 bg-white/10 rounded-full overflow-hidden">
               <div class="h-full ${
                 isMax ? 'bg-white' : 'bg-white/40'
-              } rounded-full transition-all" style="width: ${width}%"></div>
+              } rounded-full animate-bar" style="width: ${width}%; animation-delay: ${delay + 0.2}s"></div>
             </div>
             <span class="w-8 text-xs text-white/60 text-right">${count}</span>
           </div>
@@ -475,9 +496,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (topShippersEl) {
       topShippersEl.innerHTML = stats.topShippers
         .map(
-          (shipper) => `
-        <div class="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2.5">
-          <span class="text-xl w-7">${shipper.medal || shipper.rank}</span>
+          (shipper, index) => `
+        <div class="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2.5 anim-element animate-fade-up" style="animation-delay: ${0.1 * index}s">
+          <span class="text-xl w-7 ${index < 3 ? 'animate-trophy' : ''}">${shipper.medal || shipper.rank}</span>
           <p class="flex-1 font-semibold text-white truncate text-base">${
             shipper.maker
           }</p>
@@ -567,11 +588,12 @@ document.addEventListener('DOMContentLoaded', function () {
           const shortName =
             category.length > 16 ? category.substring(0, 14) + '...' : category;
           const colorClass = barColors[index] || barColors[0];
+          const delay = 0.1 * index;
           return `
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-3 anim-element animate-fade-up" style="animation-delay: ${delay}s">
             <span class="w-32 text-sm font-medium text-white truncate" title="${category}">${shortName}</span>
             <div class="flex-1 h-7 bg-white/10 rounded-full overflow-hidden">
-              <div class="h-full ${colorClass} rounded-full transition-all flex items-center justify-end pr-3" style="width: ${width}%">
+              <div class="h-full ${colorClass} rounded-full animate-bar flex items-center justify-end pr-3" style="width: ${width}%; animation-delay: ${delay + 0.2}s">
                 <span class="text-sm font-bold text-white drop-shadow-md">${count}</span>
               </div>
             </div>
@@ -809,6 +831,12 @@ document.addEventListener('DOMContentLoaded', function () {
       '<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>';
     btn.disabled = true;
 
+    // Hide share and download buttons for screenshot
+    const shareBtn = card.querySelector('.share-btn');
+    const downloadBtn = card.querySelector('.download-btn');
+    if (shareBtn) shareBtn.style.display = 'none';
+    if (downloadBtn) downloadBtn.style.display = 'none';
+
     try {
       const canvas = await html2canvas(card, {
         scale: 2,
@@ -817,6 +845,12 @@ document.addEventListener('DOMContentLoaded', function () {
         backgroundColor: null,
         width: card.offsetWidth,
         height: card.offsetHeight,
+        x: 0,
+        y: 0,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: card.offsetWidth,
+        windowHeight: card.offsetHeight,
       });
 
       const link = document.createElement('a');
@@ -827,6 +861,9 @@ document.addEventListener('DOMContentLoaded', function () {
       console.error('Failed to download:', error);
       showToast('Failed to download image');
     } finally {
+      // Restore buttons
+      if (shareBtn) shareBtn.style.display = '';
+      if (downloadBtn) downloadBtn.style.display = '';
       btn.innerHTML = originalHTML;
       btn.disabled = false;
     }

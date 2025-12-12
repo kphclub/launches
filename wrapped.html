@@ -157,6 +157,194 @@
             from { width: 0%; }
             to { width: 100%; }
         }
+        
+        /* Staggered fade-in animation */
+        @keyframes fadeSlideUp {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+        
+        .animate-fade-up {
+            opacity: 0;
+            animation: fadeSlideUp 0.6s ease-out forwards;
+        }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+        .delay-6 { animation-delay: 0.6s; }
+        .delay-7 { animation-delay: 0.7s; }
+        .delay-8 { animation-delay: 0.8s; }
+        
+        /* Bouncing emoji */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .animate-bounce-slow {
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        /* Pulsing glow effect */
+        @keyframes glowPulse {
+            0%, 100% { 
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.3),
+                             0 0 40px rgba(255, 255, 255, 0.2);
+            }
+            50% { 
+                text-shadow: 0 0 30px rgba(255, 255, 255, 0.5),
+                             0 0 60px rgba(255, 255, 255, 0.3),
+                             0 0 80px rgba(255, 255, 255, 0.2);
+            }
+        }
+        
+        .animate-glow {
+            animation: glowPulse 2s ease-in-out infinite;
+        }
+        
+        /* Floating particles */
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+        }
+        
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* Scale pop animation */
+        @keyframes scalePop {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .animate-pop {
+            opacity: 0;
+            animation: scalePop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        
+        /* Animated bar growth */
+        @keyframes barGrow {
+            from { width: 0%; }
+        }
+        
+        .animate-bar {
+            animation: barGrow 0.8s ease-out forwards;
+        }
+        
+        /* Shake animation for emojis */
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+        }
+        
+        .animate-shake {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        /* Confetti burst */
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100px) rotate(720deg); opacity: 0; }
+        }
+        
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            animation: confetti 1s ease-out forwards;
+        }
+        
+        /* Shimmer effect */
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        .animate-shimmer {
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+        
+        /* Fire flicker for streak */
+        @keyframes fireFlicker {
+            0%, 100% { transform: scale(1) rotate(-3deg); }
+            25% { transform: scale(1.1) rotate(3deg); }
+            50% { transform: scale(0.95) rotate(-3deg); }
+            75% { transform: scale(1.05) rotate(3deg); }
+        }
+        
+        .animate-fire {
+            animation: fireFlicker 0.5s ease-in-out infinite;
+        }
+        
+        /* Trophy shine */
+        @keyframes trophyShine {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3) drop-shadow(0 0 10px gold); }
+        }
+        
+        .animate-trophy {
+            animation: trophyShine 1.5s ease-in-out infinite;
+        }
+        
+        /* Rocket launch */
+        @keyframes rocketLaunch {
+            0% { transform: translateY(50px) rotate(-45deg); opacity: 0; }
+            50% { transform: translateY(-10px) rotate(-45deg); opacity: 1; }
+            100% { transform: translateY(0) rotate(0deg); opacity: 1; }
+        }
+        
+        .animate-rocket {
+            animation: rocketLaunch 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        
+        /* Robot wiggle */
+        @keyframes robotWiggle {
+            0%, 100% { transform: rotate(0deg); }
+            20% { transform: rotate(-5deg); }
+            40% { transform: rotate(5deg); }
+            60% { transform: rotate(-5deg); }
+            80% { transform: rotate(5deg); }
+        }
+        
+        .animate-robot {
+            animation: robotWiggle 1s ease-in-out infinite;
+        }
+        
+        /* Moon float */
+        @keyframes moonFloat {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+        
+        .animate-moon {
+            animation: moonFloat 3s ease-in-out infinite;
+        }
+        
+        /* Number flip */
+        @keyframes numberFlip {
+            0% { transform: rotateX(90deg); opacity: 0; }
+            100% { transform: rotateX(0deg); opacity: 1; }
+        }
+        
+        .animate-flip {
+            animation: numberFlip 0.6s ease-out forwards;
+        }
     </style>
 </head>
 <body class="bg-black text-white font-sans">
@@ -166,7 +354,7 @@
         
         <!-- Loading State -->
         <div id="loading" class="absolute inset-0 flex items-center justify-center bg-black z-50">
-            <div class="text-center">
+            <div class="flex flex-col items-center justify-center text-center">
                 <div class="w-12 h-12 rounded-full border-4 border-white/20 border-t-primary animate-spin mb-4"></div>
                 <p class="text-white/60">Loading your wrapped...</p>
             </div>
@@ -189,17 +377,16 @@
             <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="0">
                 <div class="story-card w-full max-w-[430px] gradient-hero rounded-3xl overflow-hidden relative flex flex-col" id="card-0">
                     <!-- KPH Branding -->
-                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
-                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
-                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    <div class="absolute top-8 left-6 z-10">
+                        <span class="text-white/90 text-lg font-bold">KPH 2025 Wrapped</span>
                     </div>
                     
                     <!-- Content -->
                     <div class="flex-1 flex flex-col items-center justify-center px-8 text-center">
-                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest">This Year</p>
-                        <div class="counter text-[8rem] md:text-[10rem] font-mono font-extrabold leading-none text-white" data-target="0" id="stat-total-products">0</div>
-                        <p class="text-white text-2xl md:text-3xl font-bold mt-4">Products Shipped</p>
-                        <p class="text-white/70 text-lg mt-2">by the KPH community</p>
+                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest anim-element animate-fade-up delay-1">This Year</p>
+                        <div class="counter text-[8rem] md:text-[10rem] font-mono font-extrabold leading-none text-white anim-element animate-glow" data-target="0" id="stat-total-products">0</div>
+                        <p class="text-white text-2xl md:text-3xl font-bold mt-4 anim-element animate-fade-up delay-3">Products Shipped</p>
+                        <p class="text-white/70 text-lg mt-2 anim-element animate-fade-up delay-4">by the KPH community</p>
                     </div>
                     
                     <!-- Action Buttons -->
@@ -225,16 +412,15 @@
             <!-- Card 2: Unique Makers -->
             <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="1">
                 <div class="story-card w-full max-w-[430px] gradient-makers rounded-3xl overflow-hidden relative flex flex-col" id="card-1">
-                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
-                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
-                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    <div class="absolute top-8 left-6 z-10">
+                        <span class="text-white/90 text-lg font-bold">KPH 2025 Wrapped</span>
                     </div>
                     
                     <div class="flex-1 flex flex-col items-center justify-center px-8 text-center">
-                        <p class="text-6xl mb-6">👩‍💻👨‍💻</p>
-                        <div class="counter text-[7rem] md:text-[9rem] font-mono font-extrabold leading-none text-white" data-target="0" id="stat-total-makers">0</div>
-                        <p class="text-white text-2xl md:text-3xl font-bold mt-4">Unique Builders</p>
-                        <p class="text-white/70 text-lg mt-2">turned ideas into reality</p>
+                        <p class="text-6xl mb-6 anim-element animate-bounce-slow">👩‍💻👨‍💻</p>
+                        <div class="counter text-[7rem] md:text-[9rem] font-mono font-extrabold leading-none text-white anim-element animate-glow" data-target="0" id="stat-total-makers">0</div>
+                        <p class="text-white text-2xl md:text-3xl font-bold mt-4 anim-element animate-fade-up delay-3">Unique Builders</p>
+                        <p class="text-white/70 text-lg mt-2 anim-element animate-fade-up delay-4">turned ideas into reality</p>
                     </div>
                     
                     <!-- Action Buttons -->
@@ -260,16 +446,15 @@
             <!-- Card 3: Busiest Month -->
             <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="2">
                 <div class="story-card w-full max-w-[430px] gradient-busyday rounded-3xl overflow-hidden relative flex flex-col" id="card-2">
-                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
-                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
-                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    <div class="absolute top-8 left-6 z-10">
+                        <span class="text-white/90 text-lg font-bold">KPH 2025 Wrapped</span>
                     </div>
                     
                     <div class="flex-1 flex flex-col items-center justify-center px-8 text-center">
-                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest">The community went wild in</p>
-                        <p class="text-white text-4xl md:text-5xl font-bold mb-6" id="stat-busiest-month">Loading...</p>
-                        <div class="counter text-[6rem] md:text-[8rem] font-mono font-extrabold leading-none text-yellow-300" data-target="0" id="stat-busiest-count">0</div>
-                        <p class="text-white text-2xl font-bold mt-4">products shipped 🔥</p>
+                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest anim-element animate-fade-up delay-1">The community went wild in</p>
+                        <p class="text-white text-4xl md:text-5xl font-bold mb-6 anim-element animate-fade-up delay-2" id="stat-busiest-month">Loading...</p>
+                        <div class="counter text-[6rem] md:text-[8rem] font-mono font-extrabold leading-none text-yellow-300 anim-element animate-glow" data-target="0" id="stat-busiest-count">0</div>
+                        <p class="text-white text-2xl font-bold mt-4 anim-element animate-fade-up delay-4">products shipped <span class="inline-block anim-element animate-fire">🔥</span></p>
                     </div>
                     
                     <!-- Action Buttons -->
@@ -295,18 +480,17 @@
             <!-- Card 4: Favorite Weekday -->
             <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="3">
                 <div class="story-card w-full max-w-[430px] gradient-weekday rounded-3xl overflow-hidden relative flex flex-col" id="card-3">
-                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
-                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
-                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    <div class="absolute top-8 left-6 z-10">
+                        <span class="text-white/90 text-lg font-bold">KPH 2025 Wrapped</span>
                     </div>
                     
                     <div class="flex-1 flex flex-col items-center justify-center px-8 text-center">
-                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest">Favorite shipping day</p>
-                        <p class="text-white text-5xl md:text-6xl font-extrabold mb-4" id="stat-favorite-day">Loading...</p>
-                        <p class="text-white/80 text-xl" id="stat-day-percentage">0% of all launches</p>
+                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest anim-element animate-fade-up delay-1">Favorite shipping day</p>
+                        <p class="text-white text-5xl md:text-6xl font-extrabold mb-4 anim-element animate-pop delay-2" id="stat-favorite-day">Loading...</p>
+                        <p class="text-white/80 text-xl anim-element animate-fade-up delay-3" id="stat-day-percentage">0% of all launches</p>
                         
                         <!-- Weekday bars -->
-                        <div class="w-full max-w-xs mt-8 space-y-2" id="weekday-bars">
+                        <div class="w-full max-w-xs mt-8 space-y-2 anim-element animate-fade-up delay-4" id="weekday-bars">
                             <!-- Generated by JS -->
                         </div>
                     </div>
@@ -334,16 +518,15 @@
             <!-- Card 5: Top 5 Shippers -->
             <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="4">
                 <div class="story-card w-full max-w-[430px] gradient-leaderboard rounded-3xl overflow-hidden relative flex flex-col" id="card-4">
-                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
-                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
-                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    <div class="absolute top-8 left-6 z-10">
+                        <span class="text-white/90 text-lg font-bold">KPH 2025 Wrapped</span>
                     </div>
                     
                     <div class="flex-1 flex flex-col items-center justify-center px-8 pt-14">
-                        <p class="text-4xl mb-4">🏆</p>
-                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest">Top Shippers</p>
+                        <p class="text-4xl mb-4 anim-element animate-trophy">🏆</p>
+                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest anim-element animate-fade-up delay-1">Top Shippers</p>
                         
-                        <div class="w-full max-w-sm space-y-2" id="top-shippers">
+                        <div class="w-full max-w-sm space-y-2 anim-element animate-fade-up delay-2" id="top-shippers">
                             <!-- Generated by JS -->
                         </div>
                     </div>
@@ -371,22 +554,21 @@
             <!-- Card 6: Launch Heatmap -->
             <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="5">
                 <div class="story-card w-full max-w-[430px] gradient-heatmap rounded-3xl overflow-hidden relative flex flex-col" id="card-5">
-                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
-                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
-                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    <div class="absolute top-8 left-6 z-10">
+                        <span class="text-white/90 text-lg font-bold">KPH 2025 Wrapped</span>
                     </div>
                     
                     <div class="flex-1 flex flex-col items-center justify-center px-2 pt-14">
-                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest">📅 Shipping Calendar</p>
-                        <p class="text-white/60 text-xs mb-2">Every day the community launched</p>
+                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest anim-element animate-fade-up delay-1">📅 Shipping Calendar</p>
+                        <p class="text-white/60 text-xs mb-2 anim-element animate-fade-up delay-2">Every day the community launched</p>
                         
                         <!-- GitHub-style heatmap -->
-                        <div class="flex justify-center items-center" id="github-heatmap">
+                        <div class="flex justify-center items-center anim-element animate-fade-up delay-3" id="github-heatmap">
                             <!-- Generated by JS - 52 weeks with 7 days each -->
                         </div>
                         
                         <!-- Legend -->
-                        <div class="flex items-center gap-2 mt-3 text-xs text-white/50">
+                        <div class="flex items-center gap-2 mt-3 text-xs text-white/50 anim-element animate-fade-up delay-4">
                             <span>Less</span>
                             <div class="flex gap-0.5">
                                 <div class="w-2 h-2 rounded-sm bg-white/10"></div>
@@ -422,17 +604,16 @@
             <!-- Card 7: Longest Shipping Streak -->
             <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="6">
                 <div class="story-card w-full max-w-[430px] gradient-streak rounded-3xl overflow-hidden relative flex flex-col" id="card-6">
-                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
-                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
-                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    <div class="absolute top-8 left-6 z-10">
+                        <span class="text-white/90 text-lg font-bold">KPH 2025 Wrapped</span>
                     </div>
                     
                     <div class="flex-1 flex flex-col items-center justify-center px-8 text-center">
-                        <p class="text-5xl mb-4">🔥</p>
-                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest">Longest Shipping Streak</p>
-                        <div class="counter text-[6rem] md:text-[8rem] font-mono font-extrabold leading-none text-yellow-300" data-target="0" id="stat-streak">0</div>
-                        <p class="text-white text-2xl font-bold mt-4">consecutive days</p>
-                        <p class="text-white/60 text-sm mt-4" id="stat-streak-dates">Loading...</p>
+                        <p class="text-5xl mb-4 anim-element animate-fire">🔥</p>
+                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest anim-element animate-fade-up delay-1">Longest Shipping Streak</p>
+                        <div class="counter text-[6rem] md:text-[8rem] font-mono font-extrabold leading-none text-yellow-300 anim-element animate-glow" data-target="0" id="stat-streak">0</div>
+                        <p class="text-white text-2xl font-bold mt-4 anim-element animate-fade-up delay-3">consecutive days</p>
+                        <p class="text-white/60 text-sm mt-4 anim-element animate-fade-up delay-4" id="stat-streak-dates">Loading...</p>
                     </div>
                     
                     <!-- Action Buttons -->
@@ -458,22 +639,21 @@
             <!-- Card 8: Weekend Warriors -->
             <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="7">
                 <div class="story-card w-full max-w-[430px] gradient-weekend rounded-3xl overflow-hidden relative flex flex-col" id="card-7">
-                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
-                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
-                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    <div class="absolute top-8 left-6 z-10">
+                        <span class="text-white/90 text-lg font-bold">KPH 2025 Wrapped</span>
                     </div>
                     
                     <div class="flex-1 flex flex-col items-center justify-center px-8 text-center">
-                        <p class="text-5xl mb-4">🌙</p>
-                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest">Weekend Warriors</p>
-                        <div class="flex items-baseline justify-center gap-4">
+                        <p class="text-5xl mb-4 anim-element animate-moon">🌙</p>
+                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest anim-element animate-fade-up delay-1">Weekend Warriors</p>
+                        <div class="flex items-baseline justify-center gap-4 anim-element animate-fade-up delay-2">
                             <span class="text-[4rem] md:text-[5rem] font-extrabold text-white">1</span>
                             <span class="text-[2rem] md:text-[2.5rem] font-bold text-white/60">in</span>
-                            <span class="text-[4rem] md:text-[5rem] font-mono font-extrabold text-yellow-300" id="stat-weekend-ratio">4</span>
+                            <span class="text-[4rem] md:text-[5rem] font-mono font-extrabold text-yellow-300 animate-glow" id="stat-weekend-ratio">4</span>
                         </div>
-                        <p class="text-white text-xl font-bold mt-2">products shipped on weekends</p>
-                        <p class="text-white/60 text-lg mt-4" id="stat-weekend-count">X products on Sat & Sun</p>
-                        <p class="text-white/40 text-sm mt-2">Makers never sleep 💪</p>
+                        <p class="text-white text-xl font-bold mt-2 anim-element animate-fade-up delay-3">products shipped on weekends</p>
+                        <p class="text-white/60 text-lg mt-4 anim-element animate-fade-up delay-4" id="stat-weekend-count">X products on Sat & Sun</p>
+                        <p class="text-white/40 text-sm mt-2 anim-element animate-fade-up delay-5">Makers never sleep 💪</p>
                     </div>
                     
                     <!-- Action Buttons -->
@@ -499,17 +679,16 @@
             <!-- Card 9: Category Breakdown -->
             <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="8">
                 <div class="story-card w-full max-w-[430px] gradient-categories rounded-3xl overflow-hidden relative flex flex-col" id="card-8">
-                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
-                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
-                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    <div class="absolute top-8 left-6 z-10">
+                        <span class="text-white/90 text-lg font-bold">KPH 2025 Wrapped</span>
                     </div>
                     
                     <div class="flex-1 flex flex-col items-center justify-center px-8 pt-16">
-                        <p class="text-5xl mb-3">🚀</p>
-                        <p class="text-white/80 text-lg mb-6 uppercase tracking-widest" id="stat-top-category">What KPH Built</p>
+                        <p class="text-5xl mb-3 anim-element animate-rocket">🚀</p>
+                        <p class="text-white/80 text-lg mb-6 uppercase tracking-widest anim-element animate-fade-up delay-1" id="stat-top-category">What KPH Built</p>
                         
                         <!-- Category bars -->
-                        <div class="w-full max-w-md space-y-3" id="category-bars">
+                        <div class="w-full max-w-md space-y-3 anim-element animate-fade-up delay-2" id="category-bars">
                             <!-- Generated by JS -->
                         </div>
                     </div>
@@ -537,27 +716,26 @@
             <!-- Card 10: AI Spotlight -->
             <div class="card-container absolute inset-0 flex items-center justify-center hidden-right" data-card="9">
                 <div class="story-card w-full max-w-[430px] gradient-ai rounded-3xl overflow-hidden relative flex flex-col" id="card-9">
-                    <div class="absolute top-6 left-6 flex items-center gap-2 z-10">
-                        <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-white font-bold">KPH</div>
-                        <span class="text-white/80 text-sm font-medium">2025 Wrapped</span>
+                    <div class="absolute top-8 left-6 z-10">
+                        <span class="text-white/90 text-lg font-bold">KPH 2025 Wrapped</span>
                     </div>
                     
                     <div class="flex-1 flex flex-col items-center justify-center px-6 pt-16">
-                        <p class="text-5xl mb-2">🤖</p>
-                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest">The AI Revolution</p>
+                        <p class="text-5xl mb-2 anim-element animate-robot">🤖</p>
+                        <p class="text-white/70 text-lg mb-4 uppercase tracking-widest anim-element animate-fade-up delay-1">The AI Revolution</p>
                         
                         <!-- Big stat -->
-                        <div class="text-center mb-4">
+                        <div class="text-center mb-4 anim-element animate-fade-up delay-2">
                             <div class="flex items-baseline justify-center gap-3">
                                 <span class="text-white text-5xl font-extrabold">1</span>
                                 <span class="text-white/60 text-2xl font-bold">in</span>
-                                <span class="text-yellow-300 text-5xl font-extrabold" id="stat-ai-ratio">3</span>
+                                <span class="text-yellow-300 text-5xl font-extrabold animate-glow" id="stat-ai-ratio">3</span>
                             </div>
                             <p class="text-white/80 text-lg mt-2">products was AI-powered</p>
                         </div>
                         
                         <!-- AI Monthly Trend Chart -->
-                        <div class="w-full bg-white/10 rounded-2xl p-4 mb-4">
+                        <div class="w-full bg-white/10 rounded-2xl p-4 mb-4 anim-element animate-fade-up delay-3">
                             <p class="text-white/60 text-xs uppercase tracking-wider mb-3 text-center">AI launches per month</p>
                             <div class="relative h-32">
                                 <canvas id="ai-trend-chart"></canvas>
@@ -565,7 +743,7 @@
                         </div>
                         
                         <!-- AI Count -->
-                        <p class="text-white/70 text-sm text-center">
+                        <p class="text-white/70 text-sm text-center anim-element animate-fade-up delay-4">
                             <span class="text-yellow-300 font-bold text-lg" id="stat-ai-count">57</span> AI products shipped this year
                         </p>
                     </div>
@@ -612,13 +790,6 @@
             </button>
         </div>
         
-        <!-- Back to stats link -->
-        <a href="stats.html" class="fixed top-6 right-6 text-white/50 hover:text-white text-sm flex items-center gap-1 z-50">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-        </a>
         
     </div>
     
