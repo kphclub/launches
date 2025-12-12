@@ -482,7 +482,9 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="flex-1 h-4 bg-white/10 rounded-full overflow-hidden">
               <div class="h-full ${
                 isMax ? 'bg-white' : 'bg-white/40'
-              } rounded-full animate-bar" style="width: ${width}%; animation-delay: ${delay + 0.2}s"></div>
+              } rounded-full animate-bar" style="width: ${width}%; animation-delay: ${
+            delay + 0.2
+          }s"></div>
             </div>
             <span class="w-8 text-xs text-white/60 text-right">${count}</span>
           </div>
@@ -497,8 +499,12 @@ document.addEventListener('DOMContentLoaded', function () {
       topShippersEl.innerHTML = stats.topShippers
         .map(
           (shipper, index) => `
-        <div class="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2.5 anim-element animate-fade-up" style="animation-delay: ${0.1 * index}s">
-          <span class="text-xl w-7 ${index < 3 ? 'animate-trophy' : ''}">${shipper.medal || shipper.rank}</span>
+        <div class="flex items-center gap-2 bg-white/10 rounded-lg px-3 py-2.5 anim-element animate-fade-up" style="animation-delay: ${
+          0.1 * index
+        }s">
+          <span class="text-xl w-7 ${index < 3 ? 'animate-trophy' : ''}">${
+            shipper.medal || shipper.rank
+          }</span>
           <p class="flex-1 font-semibold text-white truncate text-base">${
             shipper.maker
           }</p>
@@ -593,7 +599,9 @@ document.addEventListener('DOMContentLoaded', function () {
           <div class="flex items-center gap-3 anim-element animate-fade-up" style="animation-delay: ${delay}s">
             <span class="w-32 text-sm font-medium text-white truncate" title="${category}">${shortName}</span>
             <div class="flex-1 h-7 bg-white/10 rounded-full overflow-hidden">
-              <div class="h-full ${colorClass} rounded-full animate-bar flex items-center justify-end pr-3" style="width: ${width}%; animation-delay: ${delay + 0.2}s">
+              <div class="h-full ${colorClass} rounded-full animate-bar flex items-center justify-end pr-3" style="width: ${width}%; animation-delay: ${
+            delay + 0.2
+          }s">
                 <span class="text-sm font-bold text-white drop-shadow-md">${count}</span>
               </div>
             </div>
@@ -608,20 +616,12 @@ document.addEventListener('DOMContentLoaded', function () {
   function renderAITrendChart(aiProductsList, totalProducts) {
     const chartEl = document.getElementById('ai-trend-chart');
     const aiCountEl = document.getElementById('stat-ai-count');
-    const aiRatioEl = document.getElementById('stat-ai-ratio');
 
     if (!chartEl || !aiProductsList || aiProductsList.length === 0) return;
 
     // Update AI count
     if (aiCountEl) {
       aiCountEl.textContent = aiProductsList.length;
-    }
-
-    // Calculate and update AI ratio (1 in X)
-    if (aiRatioEl && totalProducts > 0) {
-      const aiPercent = (aiProductsList.length / totalProducts) * 100;
-      const ratio = Math.round(100 / aiPercent);
-      aiRatioEl.textContent = ratio;
     }
 
     // Group AI products by month
@@ -837,6 +837,23 @@ document.addEventListener('DOMContentLoaded', function () {
     if (shareBtn) shareBtn.style.display = 'none';
     if (downloadBtn) downloadBtn.style.display = 'none';
 
+    // Temporarily disable all animations and force visibility for screenshot
+    const animatedElements = card.querySelectorAll(
+      '.anim-element, .animate-fade-up, .animate-pop, .animate-glow, .animate-bar, .animate-bounce-slow, .animate-fire, .animate-trophy, .animate-rocket, .animate-robot, .animate-moon'
+    );
+    const originalStyles = [];
+    animatedElements.forEach((el) => {
+      originalStyles.push({
+        element: el,
+        animation: el.style.animation,
+        opacity: el.style.opacity,
+        transform: el.style.transform,
+      });
+      el.style.animation = 'none';
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+    });
+
     try {
       const canvas = await html2canvas(card, {
         scale: 2,
@@ -861,6 +878,12 @@ document.addEventListener('DOMContentLoaded', function () {
       console.error('Failed to download:', error);
       showToast('Failed to download image');
     } finally {
+      // Restore animation styles
+      originalStyles.forEach(({ element, animation, opacity, transform }) => {
+        element.style.animation = animation;
+        element.style.opacity = opacity;
+        element.style.transform = transform;
+      });
       // Restore buttons
       if (shareBtn) shareBtn.style.display = '';
       if (downloadBtn) downloadBtn.style.display = '';
