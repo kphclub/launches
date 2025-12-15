@@ -819,79 +819,6 @@ document.addEventListener('DOMContentLoaded', function () {
     heatmapContainer.innerHTML = html;
   }
 
-  // Download card as image
-  async function downloadCard(cardIndex) {
-    const card = document.getElementById(`card-${cardIndex}`);
-    if (!card) return;
-
-    // Show loading state
-    const btn = document.querySelector(`[data-card-index="${cardIndex}"]`);
-    const originalHTML = btn.innerHTML;
-    btn.innerHTML =
-      '<div class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>';
-    btn.disabled = true;
-
-    // Hide share and download buttons for screenshot
-    const shareBtn = card.querySelector('.share-btn');
-    const downloadBtn = card.querySelector('.download-btn');
-    if (shareBtn) shareBtn.style.display = 'none';
-    if (downloadBtn) downloadBtn.style.display = 'none';
-
-    // Temporarily disable all animations and force visibility for screenshot
-    const animatedElements = card.querySelectorAll(
-      '.anim-element, .animate-fade-up, .animate-pop, .animate-glow, .animate-bar, .animate-bounce-slow, .animate-fire, .animate-trophy, .animate-rocket, .animate-robot, .animate-moon'
-    );
-    const originalStyles = [];
-    animatedElements.forEach((el) => {
-      originalStyles.push({
-        element: el,
-        animation: el.style.animation,
-        opacity: el.style.opacity,
-        transform: el.style.transform,
-      });
-      el.style.animation = 'none';
-      el.style.opacity = '1';
-      el.style.transform = 'none';
-    });
-
-    try {
-      const canvas = await html2canvas(card, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: null,
-        width: card.offsetWidth,
-        height: card.offsetHeight,
-        x: 0,
-        y: 0,
-        scrollX: 0,
-        scrollY: 0,
-        windowWidth: card.offsetWidth,
-        windowHeight: card.offsetHeight,
-      });
-
-      const link = document.createElement('a');
-      link.download = `kph-wrapped-2025-${cardIndex + 1}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    } catch (error) {
-      console.error('Failed to download:', error);
-      showToast('Failed to download image');
-    } finally {
-      // Restore animation styles
-      originalStyles.forEach(({ element, animation, opacity, transform }) => {
-        element.style.animation = animation;
-        element.style.opacity = opacity;
-        element.style.transform = transform;
-      });
-      // Restore buttons
-      if (shareBtn) shareBtn.style.display = '';
-      if (downloadBtn) downloadBtn.style.display = '';
-      btn.innerHTML = originalHTML;
-      btn.disabled = false;
-    }
-  }
-
   // Share functionality
   async function shareWrapped() {
     const shareData = {
@@ -969,15 +896,6 @@ document.addEventListener('DOMContentLoaded', function () {
     },
     { passive: true }
   );
-
-  // Download buttons
-  document.querySelectorAll('.download-btn').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const cardIndex = parseInt(btn.dataset.cardIndex);
-      downloadCard(cardIndex);
-    });
-  });
 
   // Share buttons (on all cards)
   shareBtns.forEach((btn) => {
