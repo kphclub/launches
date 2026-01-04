@@ -16,6 +16,20 @@ document.addEventListener('DOMContentLoaded', function () {
   let aiProducts = [];
   let currentCardIndex = 0;
   const totalCards = 10;
+  
+  // Wrapped cutoff date - only include products up to Dec 31, 2025
+  const WRAPPED_CUTOFF_DATE = new Date('2025-12-31T23:59:59');
+  const WRAPPED_START_DATE = new Date('2025-01-01T00:00:00');
+  
+  // Filter products to only include 2025 launches
+  function filterProductsFor2025(products) {
+    return products.filter((product) => {
+      const dateStr = product.Date || product.createdAt;
+      if (!dateStr) return false;
+      const date = new Date(dateStr);
+      return date >= WRAPPED_START_DATE && date <= WRAPPED_CUTOFF_DATE;
+    });
+  }
 
   // Story auto-advance settings
   const STORY_DURATION = 6000; // 6 seconds per card
@@ -936,7 +950,8 @@ document.addEventListener('DOMContentLoaded', function () {
         productsData.result === 'success' &&
         Array.isArray(productsData.data)
       ) {
-        allProducts = productsData.data;
+        // Filter to only include 2025 products (up to Dec 31, 2025)
+        allProducts = filterProductsFor2025(productsData.data);
         const stats = calculateStats(allProducts);
         renderStats(stats);
 
@@ -959,7 +974,13 @@ document.addEventListener('DOMContentLoaded', function () {
           statsData.data.categories &&
           statsData.data.categories.AI
         ) {
-          aiProducts = statsData.data.categories.AI;
+          // Filter AI products to only include 2025 (up to Dec 31, 2025)
+          aiProducts = statsData.data.categories.AI.filter((product) => {
+            const dateStr = product.createdAt;
+            if (!dateStr) return false;
+            const date = new Date(dateStr);
+            return date >= WRAPPED_START_DATE && date <= WRAPPED_CUTOFF_DATE;
+          });
           renderAITrendChart(aiProducts, allProducts.length);
         }
 
