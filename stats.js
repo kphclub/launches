@@ -469,8 +469,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (totalMakersEl) totalMakersEl.textContent = makers.length;
     if (totalProductsEl) totalProductsEl.textContent = totalProducts;
     if (avgProductsEl) {
-      // Calculate weeks since January 1, 2025
-      const startDate = new Date('2025-01-01');
+      // Calculate weeks since January 1, 2026
+      const startDate = new Date('2026-01-01');
       const currentDate = new Date();
       const daysDifference = Math.ceil(
         (currentDate - startDate) / (1000 * 60 * 60 * 24)
@@ -634,7 +634,13 @@ document.addEventListener('DOMContentLoaded', function () {
       loadingEl.style.display = 'none';
 
       if (data.result === 'success' && Array.isArray(data.data)) {
-        allProducts = data.data;
+        // Filter products to only include 2026 data
+        allProducts = data.data.filter((product) => {
+          const dateStr = product['Date'];
+          if (!dateStr) return false;
+          const year = new Date(dateStr).getFullYear();
+          return year === 2026;
+        });
         allMakers = calculateAllMakers(allProducts);
         recentMakers = calculateRecentMakers(allProducts);
 
