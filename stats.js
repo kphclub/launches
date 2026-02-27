@@ -87,6 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     return Object.entries(makerCounts)
+      .filter(([, count]) => count > 1)
       .sort(([, a], [, b]) => b - a)
       .map(([maker, count]) => ({ maker, count }));
   }
