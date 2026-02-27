@@ -460,14 +460,14 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Function to render stats overview
-  function renderStats(makers, totalProducts) {
+  function renderStats(totalMakers, totalProducts) {
     if (!statsOverviewEl) return;
 
     const totalMakersEl = document.getElementById('total-makers');
     const totalProductsEl = document.getElementById('total-products');
     const avgProductsEl = document.getElementById('avg-products');
 
-    if (totalMakersEl) totalMakersEl.textContent = makers.length;
+    if (totalMakersEl) totalMakersEl.textContent = totalMakers;
     if (totalProductsEl) totalProductsEl.textContent = totalProducts;
     if (avgProductsEl) {
       // Calculate weeks since January 1, 2026
@@ -659,8 +659,13 @@ document.addEventListener('DOMContentLoaded', function () {
         // Render daily chart
         renderDailyChart(dailyLaunchesData);
 
+        // Calculate total unique makers (including single-launch makers)
+        const uniqueMakerNames = new Set(
+          allProducts.map((p) => p['Maker']).filter(Boolean)
+        );
+
         // Render stats overview
-        renderStats(allMakers, allProducts.length);
+        renderStats(uniqueMakerNames.size, allProducts.length);
 
         // Render full leaderboard (default to most launches tab)
         renderLeaderboard(allMakers, currentTab);
