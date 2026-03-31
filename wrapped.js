@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
-  const apiUrl = 'https://kph-mafia.microcompany.workers.dev/api/products';
-  const statsApiUrl =
-    'https://kph-mafia.microcompany.workers.dev/api/products/stats';
+  const productsDataUrl = 'wrapped-2025-products.json';
+  const statsDataUrl = 'wrapped-2025-stats.json';
   const loadingEl = document.getElementById('loading');
   const errorEl = document.getElementById('error');
   const cardsWrapper = document.getElementById('cards-wrapper');
@@ -17,19 +16,6 @@ document.addEventListener('DOMContentLoaded', function () {
   let currentCardIndex = 0;
   const totalCards = 10;
   
-  // Wrapped cutoff date - only include products up to Dec 31, 2025
-  const WRAPPED_CUTOFF_DATE = new Date('2025-12-31T23:59:59');
-  const WRAPPED_START_DATE = new Date('2025-01-01T00:00:00');
-  
-  // Filter products to only include 2025 launches
-  function filterProductsFor2025(products) {
-    return products.filter((product) => {
-      const dateStr = product.Date || product.createdAt;
-      if (!dateStr) return false;
-      const date = new Date(dateStr);
-      return date >= WRAPPED_START_DATE && date <= WRAPPED_CUTOFF_DATE;
-    });
-  }
 
   // Story auto-advance settings
   const STORY_DURATION = 6000; // 6 seconds per card
@@ -668,10 +654,8 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
-    // Get current month to limit display
-    const today = new Date();
-    const currentMonthIndex = today.getMonth();
-    const displayMonths = months.slice(0, currentMonthIndex + 1);
+    // Show all 12 months (2025 data is complete)
+    const displayMonths = months;
     const data = displayMonths.map((m) => monthCounts[m] || 0);
 
     // Create chart
@@ -938,49 +922,28 @@ document.addEventListener('DOMContentLoaded', function () {
   cardsWrapper.addEventListener('touchstart', pauseStory, { passive: true });
   cardsWrapper.addEventListener('touchend', resumeStory, { passive: true });
 
-  // Fetch both APIs in parallel
+  // Load static 2025 data (pre-filtered, no API calls needed)
   Promise.all([
-    fetch(apiUrl).then((res) => res.json()),
-    fetch(statsApiUrl)
+    fetch(productsDataUrl).then((res) => res.json()),
+    fetch(statsDataUrl)
       .then((res) => res.json())
       .catch(() => null),
   ])
-    .then(([productsData, statsData]) => {
-      if (
-        productsData.result === 'success' &&
-        Array.isArray(productsData.data)
-      ) {
-        // Filter to only include 2025 products (up to Dec 31, 2025)
-        allProducts = filterProductsFor2025(productsData.data);
+    .then(([products, statsData]) => {
+      if (Array.isArray(products)) {
+        allProducts = products;
         const stats = calculateStats(allProducts);
         renderStats(stats);
 
-        // Render category data from stats API
-        if (
-          statsData &&
-          statsData.success &&
-          statsData.data &&
-          statsData.data.summary
-        ) {
-          categoryData = statsData.data.summary.categoryBreakdown;
+        // Render category data
+        if (statsData && statsData.summary) {
+          categoryData = statsData.summary.categoryBreakdown;
           renderCategories(categoryData);
         }
 
-        // Render AI trend chart from stats API
-        if (
-          statsData &&
-          statsData.success &&
-          statsData.data &&
-          statsData.data.categories &&
-          statsData.data.categories.AI
-        ) {
-          // Filter AI products to only include 2025 (up to Dec 31, 2025)
-          aiProducts = statsData.data.categories.AI.filter((product) => {
-            const dateStr = product.createdAt;
-            if (!dateStr) return false;
-            const date = new Date(dateStr);
-            return date >= WRAPPED_START_DATE && date <= WRAPPED_CUTOFF_DATE;
-          });
+        // Render AI trend chart
+        if (statsData && statsData.categories && statsData.categories.AI) {
+          aiProducts = statsData.categories.AI;
           renderAITrendChart(aiProducts, allProducts.length);
         }
 

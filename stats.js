@@ -118,6 +118,14 @@ document.addEventListener('DOMContentLoaded', function () {
       }));
   }
 
+  // Format date as YYYY-MM-DD using local time (avoids UTC timezone shift)
+  function formatDateKey(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   // Function to calculate daily launches for current and previous month comparison
   function calculateDailyLaunches(products) {
     const today = new Date();
@@ -137,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const dateStr = product['Date'];
       if (dateStr) {
         const launchDate = new Date(dateStr);
-        const dateKey = launchDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+        const dateKey = formatDateKey(launchDate);
 
         // Current month data (from first day of current month to end of current month)
         if (launchDate >= currentMonth && launchDate < nextMonth) {
@@ -175,13 +183,11 @@ document.addEventListener('DOMContentLoaded', function () {
     for (let day = 1; day <= maxDayInMonth; day++) {
       // Current month date (only if day exists in current month)
       if (day <= daysInCurrentMonth) {
-        const currentDateKey = new Date(
+        const currentDateKey = formatDateKey(new Date(
           currentMonth.getFullYear(),
           currentMonth.getMonth(),
           day
-        )
-          .toISOString()
-          .split('T')[0];
+        ));
         result.currentMonth.push({
           date: currentDateKey,
           count: currentMonthCounts[currentDateKey] || 0,
@@ -198,13 +204,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // Previous month date (only if day exists in previous month)
       if (day <= daysInPreviousMonth) {
-        const previousDateKey = new Date(
+        const previousDateKey = formatDateKey(new Date(
           previousMonth.getFullYear(),
           previousMonth.getMonth(),
           day
-        )
-          .toISOString()
-          .split('T')[0];
+        ));
         result.previousMonth.push({
           date: previousDateKey,
           count: previousMonthCounts[previousDateKey] || 0,
