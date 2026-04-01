@@ -23,23 +23,103 @@ document.addEventListener('DOMContentLoaded', function () {
 
   let allProducts = [];
   let hashSearchFound = false;
+  let monthFilter = null;
 
-  // Function to clear search
+  // Parse ?month=april-2026 from URL
+  function getMonthFilterFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('month');
+  }
+
+  // Convert "april-2026" to a comparable month/year for filtering
+  function parseMonthParam(param) {
+    if (!param) return null;
+    const parts = param.split('-');
+    if (parts.length < 2) return null;
+    const year = parts[parts.length - 1];
+    const month = parts.slice(0, -1).join('-');
+    // Parse into a date to normalize month name
+    const date = new Date(`${month} 1, ${year}`);
+    if (isNaN(date.getTime())) return null;
+    return { month: date.getMonth(), year: date.getFullYear() };
+  }
+
+  // Generate month slug like "april-2026"
+  function toMonthSlug(monthYearStr) {
+    const date = new Date(monthYearStr);
+    if (isNaN(date.getTime())) return null;
+    const monthName = date.toLocaleDateString('en-US', { month: 'long' }).toLowerCase();
+    return `${monthName}-${date.getFullYear()}`;
+  }
+
+  // Filter products by month
+  function filterByMonth(products, monthParam) {
+    const parsed = parseMonthParam(monthParam);
+    if (!parsed) return products;
+    return products.filter((product) => {
+      const date = new Date(product['Date']);
+      if (isNaN(date.getTime())) return false;
+      return date.getMonth() === parsed.month && date.getFullYear() === parsed.year;
+    });
+  }
+
+  // Set month filter and update URL (global for onclick)
+  window.setMonthFilter = function setMonthFilter(slug) {
+    const url = new URL(window.location);
+    if (slug) {
+      url.searchParams.set('month', slug);
+    } else {
+      url.searchParams.delete('month');
+    }
+    history.pushState({}, '', url);
+    monthFilter = slug;
+    applyFilters();
+    updatePageTitle();
+  }
+
+  // Apply both search and month filters
+  function applyFilters() {
+    let products = allProducts;
+    if (monthFilter) {
+      products = filterByMonth(products, monthFilter);
+    }
+    const query = searchInput ? searchInput.value.trim() : '';
+    if (query) {
+      products = filterProducts(query, products);
+    }
+    renderProducts(products);
+  }
+
+  // Update page title based on active month filter
+  function updatePageTitle() {
+    if (monthFilter) {
+      const parsed = parseMonthParam(monthFilter);
+      if (parsed) {
+        const label = new Date(parsed.year, parsed.month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        pageTitleEl.textContent = `${label} Launches 🚀`;
+      }
+    } else {
+      pageTitleEl.textContent = 'KPH Product Launches 🚀';
+    }
+  }
+
+  // Initialize month filter from URL
+  monthFilter = getMonthFilterFromUrl();
+
+  // Function to clear search and month filter
   function clearSearch() {
     if (searchInput) {
       searchInput.value = '';
-      // Update URL by removing hash
-      history.pushState(
-        '',
-        document.title,
-        window.location.pathname + window.location.search
-      );
-      // Render all products
-      renderProducts(allProducts);
-      // Hide clear button
-      if (clearSearchBtn) {
-        clearSearchBtn.classList.add('hidden');
-      }
+    }
+    monthFilter = null;
+    const url = new URL(window.location);
+    url.searchParams.delete('month');
+    url.hash = '';
+    history.pushState('', document.title, url.pathname);
+    renderProducts(allProducts);
+    updatePageTitle();
+    if (clearSearchBtn) {
+      clearSearchBtn.classList.add('hidden');
     }
   }
 
@@ -188,14 +268,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Render products by month groups
     groupedByMonth.forEach((group) => {
-      // Add month header with count
+      const slug = toMonthSlug(group.month);
+      const monthLink = slug ? `?month=${slug}` : '#';
       productListEl.innerHTML += `
         <div class="py-4">
-          <h2 class="text-xl font-semibold text-primary mb-4">${
-            group.month
-          } <span class="text-sm font-normal text-gray-500">(${
-        group.count
-      })</span></h2>
+          <h2 class="text-xl font-semibold mb-4">
+            <a href="${monthLink}" class="text-primary hover:underline" onclick="event.preventDefault(); setMonthFilter('${slug}')">${group.month}</a>
+            <span class="text-sm font-normal text-gray-500">(${group.count})</span>
+          </h2>
           <div class="flex flex-col divide-y divide-gray-100">
             ${renderProductGroup(group.products)}
           </div>
@@ -267,11 +347,12 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   // Function to filter products based on search query
-  function filterProducts(query) {
-    if (!query) return allProducts;
+  function filterProducts(query, products) {
+    const source = products || allProducts;
+    if (!query) return source;
 
     query = query.toLowerCase();
-    return allProducts.filter((product) => {
+    return source.filter((product) => {
       const name = product['Product Name'].toLowerCase();
       const description = product['Product Description'].toLowerCase();
       const maker = product['Maker'].toLowerCase();
@@ -288,8 +369,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (searchInput) {
     searchInput.addEventListener('input', function (e) {
       const query = e.target.value.trim();
-      const filteredProducts = filterProducts(query);
-      renderProducts(filteredProducts);
+      applyFilters();
 
       // Update URL hash with search term
       updateUrlHash(query);
@@ -298,6 +378,13 @@ document.addEventListener('DOMContentLoaded', function () {
       toggleClearButton();
     });
   }
+
+  // Handle browser back/forward for month filter
+  window.addEventListener('popstate', function () {
+    monthFilter = getMonthFilterFromUrl();
+    updatePageTitle();
+    applyFilters();
+  });
 
   fetch(apiUrl)
     .then((response) => {
@@ -319,10 +406,12 @@ document.addEventListener('DOMContentLoaded', function () {
           statsButton.innerHTML = `📊 View Launch Stats (${allProducts.length} products)`;
         }
 
-        // If hash search was found on page load, filter products now
-        if (hashSearchFound) {
-          const filteredProducts = filterProducts(hashSearch);
-          renderProducts(filteredProducts);
+        // Update page title if month filter is active
+        updatePageTitle();
+
+        // Apply initial filters (month param and/or hash search)
+        if (hashSearchFound || monthFilter) {
+          applyFilters();
         } else {
           renderProducts(allProducts);
         }
