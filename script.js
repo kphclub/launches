@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function renderProductGroup(products) {
     let html = '';
 
-    products.forEach((product, index) => {
+    products.filter(product => product['Product Link']).forEach((product, index) => {
       // Ensure product link has https
       const productLink = ensureHttps(product['Product Link']);
 
