@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
-  const baseUrl = 'https://kph-mafia.microcompany.workers.dev';
+  const baseUrl = 'https://kph.shyjal.com';
   const hackathonApiUrl = `${baseUrl}/api/hackathon/launches`;
   const repliesApiUrl = `${baseUrl}/api/hackathon/replies`;
 

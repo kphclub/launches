@@ -12,7 +12,7 @@ function searchByMaker(makerName) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  const apiUrl = 'https://kph-mafia.microcompany.workers.dev/api/products';
+  const apiUrl = 'https://kph.shyjal.com/api/products';
   const productListEl = document.getElementById('product-list');
   const loadingEl = document.getElementById('loading');
   const errorEl = document.getElementById('error');
