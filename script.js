@@ -353,9 +353,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     query = query.toLowerCase();
     return source.filter((product) => {
-      const name = product['Product Name'].toLowerCase();
-      const description = product['Product Description'].toLowerCase();
-      const maker = product['Maker'].toLowerCase();
+      const name = (product['Product Name'] || '').toLowerCase();
+      const description = (product['Product Description'] || '').toLowerCase();
+      const maker = (product['Maker'] || '').toLowerCase();
 
       return (
         name.includes(query) ||
