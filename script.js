@@ -329,14 +329,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="text-xs text-gray-400">${launchDate}</div>
             </div>
             <div class="hidden md:flex ml-auto">
-                <a href="${productLink}" target="_blank" class="flex flex-col items-center p-2 border border-gray-200 rounded-lg min-w-[60px] hover:bg-gray-50">
-                    <div class="text-gray-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                            <polyline points="15 3 21 3 21 9"></polyline>
-                            <line x1="10" y1="14" x2="21" y2="3"></line>
-                        </svg>
-                    </div>
+                <a href="${productLink}" target="_blank" class="flex flex-col items-center justify-center p-2 border border-gray-200 rounded-lg min-w-[60px] hover:bg-gray-50 text-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    <div class="text-sm font-semibold leading-none mt-1">${product['Reaction Count'] ?? 0}</div>
                 </a>
             </div>
         </div>
