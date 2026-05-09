@@ -312,9 +312,9 @@ document.addEventListener('DOMContentLoaded', function () {
       </svg>`;
 
       html += `
-        <div class="flex flex-col md:flex-row items-start md:items-center gap-4 py-6">
-            <div class="flex-grow">
-                <h2 class="text-base md:text-lg font-semibold mb-1">
+        <div class="py-6">
+            <div class="flex flex-row items-center gap-3 mb-1">
+                <h2 class="text-base md:text-lg font-semibold flex-grow min-w-0">
                     <a href="${productLink}" target="_blank" class="text-gray-800 hover:text-red-500 inline-flex items-center group">
                       <img src="https://www.google.com/s2/favicons?domain=${domain}" alt="" class="mr-2 h-4 w-4" />
                       ${product['Product Name']}
@@ -322,28 +322,18 @@ document.addEventListener('DOMContentLoaded', function () {
                       <span class="hidden md:inline-block opacity-0 group-hover:opacity-100 text-gray-500 transition-opacity">${externalLinkSvg}</span>
                     </a>
                 </h2>
-                <div class="text-xs md:text-sm text-gray-500 mb-1">
-                  <span class="cursor-pointer hover:text-primary" onclick="searchByMaker('${product['Maker']}')">${product['Maker']}</span>
-                </div>
-                <p class="text-gray-800 text-sm md:text-base max-w-5xl mb-1">${product['Product Description']}</p>
-                <div class="text-xs text-gray-400 flex items-center gap-2">
-                  <span>${launchDate}</span>
-                  <span class="md:hidden inline-flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                    <span>${product['Reaction Count'] ?? 0}</span>
-                  </span>
-                </div>
-            </div>
-            <div class="hidden md:flex ml-auto">
-                <a href="${productLink}" target="_blank" class="flex flex-col items-center justify-center p-2 border border-gray-200 rounded-lg min-w-[60px] hover:bg-gray-50 text-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <a href="${productLink}" target="_blank" class="shrink-0 inline-flex items-center gap-1 px-2 py-1 border border-gray-200 rounded-md text-gray-700 hover:bg-gray-50 text-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                     </svg>
-                    <div class="text-sm font-semibold leading-none mt-1">${product['Reaction Count'] ?? 0}</div>
+                    <span class="font-semibold leading-none">${product['Reaction Count'] ?? 0}</span>
                 </a>
             </div>
+            <div class="text-xs md:text-sm text-gray-500 mb-1">
+              <span class="cursor-pointer hover:text-primary" onclick="searchByMaker('${product['Maker']}')">${product['Maker']}</span>
+            </div>
+            <p class="text-gray-800 text-sm md:text-base mb-1">${product['Product Description']}</p>
+            <div class="text-xs text-gray-400">${launchDate}</div>
         </div>
       `;
     });
