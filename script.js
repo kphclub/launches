@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let allProducts = [];
   let hashSearchFound = false;
   let monthFilter = null;
+  let sortMode = 'recent';
 
   // Parse ?month=april-2026 from URL
   function getMonthFilterFromUrl() {
@@ -138,6 +139,30 @@ document.addEventListener('DOMContentLoaded', function () {
     clearSearchBtn.addEventListener('click', clearSearch);
   }
 
+  // Set up the recent / reactions sort switcher
+  const sortOptionEls = document.querySelectorAll('.sort-option');
+
+  function updateSortSwitcherUI() {
+    sortOptionEls.forEach((btn) => {
+      const isActive = btn.dataset.sort === sortMode;
+      btn.classList.toggle('bg-white', isActive);
+      btn.classList.toggle('text-gray-900', isActive);
+      btn.classList.toggle('shadow-sm', isActive);
+      btn.classList.toggle('text-gray-500', !isActive);
+    });
+  }
+
+  sortOptionEls.forEach((btn) => {
+    btn.addEventListener('click', function () {
+      if (sortMode === btn.dataset.sort) return;
+      sortMode = btn.dataset.sort;
+      updateSortSwitcherUI();
+      applyFilters();
+    });
+  });
+
+  updateSortSwitcherUI();
+
   // Function to toggle clear button visibility
   function toggleClearButton() {
     if (clearSearchBtn) {
@@ -248,9 +273,20 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       .map((month) => ({
         month,
-        products: grouped[month],
+        products: sortProductsInGroup(grouped[month]),
         count: grouped[month].length,
       }));
+  }
+
+  // Sort products within a month group based on the active sort mode
+  function sortProductsInGroup(products) {
+    const sorted = [...products];
+    if (sortMode === 'reactions') {
+      sorted.sort((a, b) => (b['Reaction Count'] ?? 0) - (a['Reaction Count'] ?? 0));
+    } else {
+      sorted.sort((a, b) => new Date(b['Date']) - new Date(a['Date']));
+    }
+    return sorted;
   }
 
   // Function to render filtered products grouped by month
