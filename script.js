@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
     sortOptionEls.forEach((btn) => {
       const isActive = btn.dataset.sort === sortMode;
       btn.classList.toggle('bg-white', isActive);
-      btn.classList.toggle('text-gray-900', isActive);
+      btn.classList.toggle('text-primary', isActive);
       btn.classList.toggle('shadow-sm', isActive);
       btn.classList.toggle('text-gray-500', !isActive);
     });
