@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let allProducts = [];
   let hashSearchFound = false;
   let monthFilter = null;
-  let sortMode = 'recent';
+  let sortMode = 'reactions';
 
   // Parse ?month=april-2026 from URL
   function getMonthFilterFromUrl() {
