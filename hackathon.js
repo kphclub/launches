@@ -1,3 +1,25 @@
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function safeUrl(value) {
+  if (!value) return '#';
+  const raw = String(value).trim();
+  const withScheme = /^https?:\/\//i.test(raw) ? raw : 'https://' + raw;
+  try {
+    const url = new URL(withScheme);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '#';
+    return url.href;
+  } catch (e) {
+    return '#';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   const baseUrl = 'https://kph.shyjal.com';
   const hackathonApiUrl = `${baseUrl}/api/hackathon/launches`;
@@ -111,9 +133,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
       html += `
                 <div class="comment">
-                    <div class="comment-author">${reply.memberName}</div>
+                    <div class="comment-author">${escapeHtml(reply.memberName)}</div>
                     <div class="comment-date">${formattedDate}</div>
-                    <div class="comment-text">${reply.message}</div>
+                    <div class="comment-text">${escapeHtml(reply.message)}</div>
                 </div>
             `;
     });
@@ -134,10 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
     projects.forEach((project, index) => {
       const rank = index + 1;
       const hasLink = project.link && project.link.trim() !== '';
-      const fullUrl =
-        hasLink && !project.link.startsWith('http')
-          ? 'https://' + project.link
-          : project.link;
+      const fullUrl = hasLink ? safeUrl(project.link) : '#';
       const domain = hasLink ? extractDomain(project.link) : '';
       const formattedDate = formatDate(project.created_at);
       const reactionCount = project.reactionCount || 0;
@@ -149,19 +168,19 @@ document.addEventListener('DOMContentLoaded', function () {
                          <div class="title">
                              ${
                                hasLink
-                                 ? `<a href="${fullUrl}" target="_blank">${project.name}</a>`
-                                 : `<span>${project.name}</span>`
+                                 ? `<a href="${escapeHtml(fullUrl)}" target="_blank">${escapeHtml(project.name)}</a>`
+                                 : `<span>${escapeHtml(project.name)}</span>`
                              }
                              ${
                                domain
-                                 ? `<span class="domain">(<a href="${fullUrl}" target="_blank">${domain}</a>)</span>`
+                                 ? `<span class="domain">(<a href="${escapeHtml(fullUrl)}" target="_blank">${escapeHtml(domain)}</a>)</span>`
                                  : ''
                              }
                          </div>
                     </div>
-                    <div class="description">${project.description || ''}</div>
+                    <div class="description">${escapeHtml(project.description || '')}</div>
                     <div class="subtext">
-                        by <strong>${project.memberName}</strong>
+                        by <strong>${escapeHtml(project.memberName)}</strong>
                         ${formattedDate} |
                         ${reactionCount} reaction${
         reactionCount === 1 ? '' : 's'
@@ -255,9 +274,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
       html += `
         <div class="comment">
-          <div class="comment-author">${reply.memberName}</div>
+          <div class="comment-author">${escapeHtml(reply.memberName)}</div>
           <div class="comment-date">${formattedDate}</div>
-          <div class="comment-text">${reply.message}</div>
+          <div class="comment-text">${escapeHtml(reply.message)}</div>
         </div>
       `;
     });

@@ -1,3 +1,25 @@
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function safeUrl(value) {
+  if (!value) return '#';
+  const raw = String(value).trim();
+  const withScheme = /^https?:\/\//i.test(raw) ? raw : 'https://' + raw;
+  try {
+    const url = new URL(withScheme);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '#';
+    return url.href;
+  } catch (e) {
+    return '#';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   const apiUrl = 'https://kph.shyjal.com/api/products';
   const leaderboardListEl = document.getElementById('leaderboard-list');
@@ -543,9 +565,7 @@ document.addEventListener('DOMContentLoaded', function () {
     leaderboardListEl.innerHTML = makersWithRanks
       .map(
         (item) => `
-        <div class="flex items-center justify-between p-4 md:p-6 hover:bg-gray-50 transition-colors cursor-pointer" onclick="goToMakerProducts('${
-          item.maker
-        }')">
+        <div class="flex items-center justify-between p-4 md:p-6 hover:bg-gray-50 transition-colors cursor-pointer" data-maker="${escapeHtml(item.maker)}" onclick="goToMakerProducts(this.dataset.maker)">
           <div class="flex items-center space-x-4">
             <div class="flex items-center space-x-3">
               <div class="text-lg font-bold text-gray-600 min-w-[3rem] flex items-center space-x-1">
@@ -556,9 +576,7 @@ document.addEventListener('DOMContentLoaded', function () {
               </div>
             </div>
             <div>
-              <div class="font-semibold text-gray-800 text-lg">${
-                item.maker
-              }</div>
+              <div class="font-semibold text-gray-800 text-lg">${escapeHtml(item.maker)}</div>
               <div class="text-sm text-gray-500">
                 ${
                   tabType === 'most-launches'

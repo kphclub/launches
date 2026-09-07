@@ -1,3 +1,25 @@
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function safeUrl(value) {
+  if (!value) return '#';
+  const raw = String(value).trim();
+  const withScheme = /^https?:\/\//i.test(raw) ? raw : 'https://' + raw;
+  try {
+    const url = new URL(withScheme);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '#';
+    return url.href;
+  } catch (e) {
+    return '#';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   const baseUrl = 'https://kph.shyjal.com';
   const hackathonApiUrl = `${baseUrl}/api/hackathon/launches`;
@@ -60,10 +82,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // Render project details
   function renderProject(project) {
     const hasLink = project.link && project.link.trim() !== '';
-    const fullUrl =
-      hasLink && !project.link.startsWith('http')
-        ? 'https://' + project.link
-        : project.link;
+    const fullUrl = hasLink ? safeUrl(project.link) : '#';
     const domain = hasLink ? extractDomain(project.link) : '';
     const formattedDate = formatDate(project.created_at);
     const reactionCount = project.reactionCount || 0;
@@ -80,7 +99,7 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
       projectLinkEl.style.display = 'none';
       // Create a non-clickable span for the project name
-      projectLinkEl.parentNode.innerHTML = `<span>${project.name}</span><span class="project-domain" id="project-domain"></span>`;
+      projectLinkEl.parentNode.innerHTML = `<span>${escapeHtml(project.name)}</span><span class="project-domain" id="project-domain"></span>`;
     }
 
     document.getElementById('project-description').textContent =
@@ -122,10 +141,10 @@ document.addEventListener('DOMContentLoaded', function () {
       html += `
         <div class="comment">
           <div class="comment-header">
-            <span class="comment-author">${reply.memberName}</span>
+            <span class="comment-author">${escapeHtml(reply.memberName)}</span>
             <span class="comment-date">${formattedDate}</span>
           </div>
-          <div class="comment-text">${reply.message}</div>
+          <div class="comment-text">${escapeHtml(reply.message)}</div>
         </div>
       `;
     });

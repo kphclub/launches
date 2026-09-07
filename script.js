@@ -1,3 +1,25 @@
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function safeUrl(value) {
+  if (!value) return '#';
+  const raw = String(value).trim();
+  const withScheme = /^https?:\/\//i.test(raw) ? raw : 'https://' + raw;
+  try {
+    const url = new URL(withScheme);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '#';
+    return url.href;
+  } catch (e) {
+    return '#';
+  }
+}
+
 // Function to search by maker name
 function searchByMaker(makerName) {
   const searchInput = document.getElementById('search-input');
@@ -210,11 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Function to ensure URL has https prefix
   function ensureHttps(url) {
-    if (!url) return '#';
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      return 'https://' + url;
-    }
-    return url;
+    return safeUrl(url);
   }
 
   // Function to get month and year from a date
@@ -352,14 +370,14 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="flex-grow min-w-0 w-full">
                 <div class="flex flex-row items-center gap-3 mb-1">
                     <h2 class="text-base md:text-lg font-semibold flex-grow min-w-0">
-                        <a href="${productLink}" target="_blank" class="text-gray-800 hover:text-red-500 inline-flex items-center group">
-                          <img src="https://www.google.com/s2/favicons?domain=${domain}" alt="" class="mr-2 h-4 w-4" />
-                          ${product['Product Name']}
+                        <a href="${escapeHtml(productLink)}" target="_blank" class="text-gray-800 hover:text-red-500 inline-flex items-center group">
+                          <img src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}" alt="" class="mr-2 h-4 w-4" />
+                          ${escapeHtml(product['Product Name'])}
                           <span class="md:hidden text-gray-500">${externalLinkSvg}</span>
                           <span class="hidden md:inline-block opacity-0 group-hover:opacity-100 text-gray-500 transition-opacity">${externalLinkSvg}</span>
                         </a>
                     </h2>
-                    <a href="${productLink}" target="_blank" class="md:hidden shrink-0 inline-flex items-center gap-1 px-2 py-1 border border-gray-200 rounded-md text-gray-700 hover:bg-gray-50 text-sm">
+                    <a href="${escapeHtml(productLink)}" target="_blank" class="md:hidden shrink-0 inline-flex items-center gap-1 px-2 py-1 border border-gray-200 rounded-md text-gray-700 hover:bg-gray-50 text-sm">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                         </svg>
@@ -367,13 +385,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     </a>
                 </div>
                 <div class="text-xs md:text-sm text-gray-500 mb-1">
-                  <span class="cursor-pointer hover:text-primary" onclick="searchByMaker('${product['Maker']}')">${product['Maker']}</span>
+                  <span class="cursor-pointer hover:text-primary" data-maker="${escapeHtml(product['Maker'])}" onclick="searchByMaker(this.dataset.maker)">${escapeHtml(product['Maker'])}</span>
                 </div>
-                <p class="text-gray-800 text-sm md:text-base max-w-5xl mb-1">${product['Product Description']}</p>
+                <p class="text-gray-800 text-sm md:text-base max-w-5xl mb-1">${escapeHtml(product['Product Description'])}</p>
                 <div class="text-xs text-gray-400">${launchDate}</div>
             </div>
             <div class="hidden md:flex ml-auto shrink-0">
-                <a href="${productLink}" target="_blank" class="flex flex-col items-center justify-center p-2 border border-gray-200 rounded-lg min-w-[60px] hover:bg-gray-50 text-gray-700">
+                <a href="${escapeHtml(productLink)}" target="_blank" class="flex flex-col items-center justify-center p-2 border border-gray-200 rounded-lg min-w-[60px] hover:bg-gray-50 text-gray-700">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                     </svg>
