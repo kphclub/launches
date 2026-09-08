@@ -468,11 +468,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Update leaderboard title and subtitle based on active tab
     if (leaderboardTitle && leaderboardSubtitle) {
       if (tabName === 'most-launches') {
-        leaderboardTitle.textContent = 'Makers with Most Launches';
+        leaderboardTitle.textContent = 'Makers with Most Launches in 2026';
         leaderboardSubtitle.textContent =
           'Makers ranked by total number of products launched';
       } else {
-        leaderboardTitle.textContent = 'Makers with Recent Launches';
+        leaderboardTitle.textContent = 'Makers with Recent Launches in 2026';
         leaderboardSubtitle.textContent =
           'Makers sorted by their most recent product launch';
       }
