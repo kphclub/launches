@@ -41,14 +41,22 @@
                 </svg>
             </button>
         </div>
-        <a href="/stats" class="md:hidden text-gray-700 hover:text-primary font-medium text-sm whitespace-nowrap">Stats</a>
-        <div class="flex items-center space-x-6">
-            <nav class="hidden md:flex items-center space-x-6">
-                <a href="/stats" class="text-gray-700 hover:text-primary font-medium text-sm">2026 Stats</a>
-                <a href="/wrapped" class="text-gray-700 hover:text-primary font-medium text-sm">2025 Wrapped</a>
-                <a href="https://join.kph.club" class="text-gray-700 hover:text-primary font-medium text-sm">Join KPH</a>
-            </nav>
-        </div>
+        <nav class="hidden md:flex items-center space-x-6">
+            <a href="/hackathon" class="text-gray-700 hover:text-primary font-medium text-sm">Hackathon</a>
+            <a href="/stats" class="text-gray-700 hover:text-primary font-medium text-sm">2026 Stats</a>
+            <a href="/wrapped" class="text-gray-700 hover:text-primary font-medium text-sm">2025 Wrapped</a>
+            <a href="https://join.kph.club" class="text-gray-700 hover:text-primary font-medium text-sm">Join KPH</a>
+        </nav>
+        <button id="menu-button" type="button" class="md:hidden ml-auto p-2 -mr-2 text-gray-700 hover:text-primary" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+            <svg id="menu-open-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" /></svg>
+            <svg id="menu-close-icon" class="hidden" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+        </button>
+        <nav id="mobile-menu" class="hidden md:hidden absolute top-full inset-x-0 bg-white border-b border-gray-200 shadow-sm py-1">
+            <a href="/hackathon" class="block px-4 py-3 text-gray-700 hover:text-primary font-medium text-sm">Hackathon</a>
+            <a href="/stats" class="block px-4 py-3 text-gray-700 hover:text-primary font-medium text-sm">2026 Stats</a>
+            <a href="/wrapped" class="block px-4 py-3 text-gray-700 hover:text-primary font-medium text-sm">2025 Wrapped</a>
+            <a href="https://join.kph.club" class="block px-4 py-3 text-gray-700 hover:text-primary font-medium text-sm">Join KPH</a>
+        </nav>
     </header>
 
     <div class="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-8">
@@ -70,6 +78,7 @@
         <div id="product-list" class="flex flex-col divide-y divide-gray-100"></div>
     </div>
 
+    <script src="nav.js"></script>
     <script src="script.js"></script>
 </body>
 </html> 
