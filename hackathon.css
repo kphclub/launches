@@ -13,7 +13,9 @@ body {
 
 .header-content {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    row-gap: 4px;
     padding: 4px;
 }
 
@@ -36,6 +38,7 @@ body {
     color: black;
     text-decoration: none;
     margin-right: 10px;
+    white-space: nowrap;
 }
 
 .header-nav {
@@ -43,6 +46,7 @@ body {
     text-decoration: none;
     margin-right: 10px;
     font-size: 9pt;
+    white-space: nowrap;
 }
 
 .header-nav:hover {
@@ -230,11 +234,10 @@ body {
 @media (max-width: 768px) {
     body {
         font-size: 14px;
-        padding: 0 8px;
     }
 
     .header-content {
-        padding: 6px 8px;
+        padding: 6px 12px;
     }
 
     .header-title {
@@ -247,7 +250,7 @@ body {
     }
 
     .content {
-        padding: 8px 4px;
+        padding: 8px 12px;
     }
 
     .rank {
@@ -327,14 +330,6 @@ body {
 }
 
 @media (max-width: 480px) {
-    .header-nav {
-        display: none;
-    }
-
-    .edition-link {
-        display: inline;
-    }
-
     .rank {
         width: 16px;
         font-size: 11px;
