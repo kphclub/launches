@@ -22,7 +22,8 @@ function safeUrl(value) {
 
 document.addEventListener('DOMContentLoaded', function () {
   const baseUrl = 'https://kph.shyjal.com';
-  const hackathonApiUrl = `${baseUrl}/api/hackathon/launches`;
+  const edition = document.body.dataset.edition;
+  const hackathonApiUrl = `${baseUrl}/api/hackathon/launches?edition=${encodeURIComponent(edition)}`;
   const repliesApiUrl = `${baseUrl}/api/hackathon/replies`;
 
   const projectListEl = document.getElementById('project-list');
@@ -67,80 +68,6 @@ document.addEventListener('DOMContentLoaded', function () {
     } catch (e) {
       return 'recently';
     }
-  }
-
-  // Toggle comments visibility
-  function toggleComments(messageId, event) {
-    event.preventDefault();
-
-    const commentsSection = document.getElementById(`comments-${messageId}`);
-    const toggleLink = event.target;
-
-    if (
-      commentsSection.style.display === 'none' ||
-      commentsSection.style.display === ''
-    ) {
-      // Load and show comments
-      loadComments(messageId, commentsSection, toggleLink);
-    } else {
-      // Hide comments
-      commentsSection.style.display = 'none';
-      toggleLink.textContent = toggleLink.textContent.replace(
-        'hide',
-        'feedback'
-      );
-    }
-  }
-
-  // Load comments for a project
-  function loadComments(messageId, commentsSection, toggleLink) {
-    toggleLink.textContent = 'loading...';
-
-    fetch(`${repliesApiUrl}/${messageId}`)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Failed to load comments');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (data.replies && data.replies.length > 0) {
-          renderComments(data.replies, commentsSection);
-          commentsSection.style.display = 'block';
-          toggleLink.textContent = `hide (${data.replies.length})`;
-        } else {
-          commentsSection.innerHTML =
-            '<div class="comment">No comments yet.</div>';
-          commentsSection.style.display = 'block';
-          toggleLink.textContent = 'hide';
-        }
-      })
-      .catch((error) => {
-        console.error('Error loading comments:', error);
-        commentsSection.innerHTML =
-          '<div class="comment" style="color: #ff6600;">Failed to load comments.</div>';
-        commentsSection.style.display = 'block';
-        toggleLink.textContent = 'hide';
-      });
-  }
-
-  // Render comments
-  function renderComments(replies, commentsSection) {
-    let html = '';
-
-    replies.forEach((reply) => {
-      const formattedDate = formatDate(reply.created_at);
-
-      html += `
-                <div class="comment">
-                    <div class="comment-author">${escapeHtml(reply.memberName)}</div>
-                    <div class="comment-date">${formattedDate}</div>
-                    <div class="comment-text">${escapeHtml(reply.message)}</div>
-                </div>
-            `;
-    });
-
-    commentsSection.innerHTML = html;
   }
 
   // Render projects in Hacker News style

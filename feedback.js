@@ -74,9 +74,16 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Find project by message ID
-  function findProject(projects, messageId) {
-    return projects.find((project) => project.message_id === messageId);
+  function hackathonPageFor(edition) {
+    return edition === '2025' ? 'hackathon.html' : `hackathon-${edition}.html`;
+  }
+
+  function renderEdition(edition) {
+    if (!edition) return;
+    const titleEl = document.getElementById('hackathon-title');
+    titleEl.textContent = `KPH Hackathon ${edition}`;
+    titleEl.href = hackathonPageFor(edition);
+    document.getElementById('back-link').href = hackathonPageFor(edition);
   }
 
   // Render project details
@@ -159,8 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    // Load all projects first to find the specific one
-    fetch(hackathonApiUrl)
+    fetch(`${hackathonApiUrl}?messageId=${encodeURIComponent(messageId)}`)
       .then((response) => {
         if (!response.ok) {
           throw new Error('Failed to load projects');
@@ -172,11 +178,12 @@ document.addEventListener('DOMContentLoaded', function () {
           throw new Error('Invalid projects data');
         }
 
-        const project = findProject(data.launches, messageId);
+        const [project] = data.launches;
         if (!project) {
           throw new Error('Project not found');
         }
 
+        renderEdition(project.edition);
         renderProject(project);
 
         // Load comments
