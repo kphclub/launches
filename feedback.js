@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   function hackathonPageFor(edition) {
-    return edition === '2025' ? 'hackathon.html' : `hackathon-${edition}.html`;
+    return edition === '2026' ? 'hackathon.html' : `hackathon-${edition}.html`;
   }
 
   function renderEdition(edition) {

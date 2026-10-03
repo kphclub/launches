@@ -331,6 +331,10 @@ body {
         display: none;
     }
 
+    .edition-link {
+        display: inline;
+    }
+
     .rank {
         width: 16px;
         font-size: 11px;
