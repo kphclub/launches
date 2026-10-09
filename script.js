@@ -43,6 +43,13 @@ document.addEventListener('DOMContentLoaded', function () {
   const logoEl = document.getElementById('logo');
   const pageTitleEl = document.getElementById('page-title');
 
+  const headerEl = document.querySelector('header');
+  const syncHeaderHeight = () => {
+    document.documentElement.style.setProperty('--header-h', `${headerEl.offsetHeight}px`);
+  };
+  syncHeaderHeight();
+  new ResizeObserver(syncHeaderHeight).observe(headerEl);
+
   let allProducts = [];
   let hashSearchFound = false;
   let monthFilter = null;
@@ -325,8 +332,8 @@ document.addEventListener('DOMContentLoaded', function () {
       const slug = toMonthSlug(group.month);
       const monthLink = slug ? `?month=${slug}` : '#';
       productListEl.innerHTML += `
-        <div class="py-4">
-          <h2 class="text-xl font-semibold mb-4">
+        <div class="pt-2 pb-4">
+          <h2 class="sticky top-[var(--header-h,64px)] z-[5] bg-white py-2 mb-2 text-xl font-semibold">
             <a href="${monthLink}" class="text-primary hover:underline" onclick="event.preventDefault(); setMonthFilter('${slug}')">${group.month}</a>
             <span class="text-sm font-normal text-gray-500">(${group.count})</span>
           </h2>
