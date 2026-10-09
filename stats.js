@@ -544,9 +544,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         return `
         <a href="${escapeHtml(productLink)}" target="_blank" rel="noopener" class="flex items-center gap-3 md:gap-4 p-4 md:px-6 hover:bg-gray-50 transition-colors group">
-          <div class="text-lg font-bold text-gray-600 min-w-[3rem] flex items-center space-x-1">
-            <span>${index + 1}</span>
-            ${medals[index] ? `<span class="text-xl">${medals[index]}</span>` : ''}
+          <div class="text-lg font-bold text-gray-600 min-w-[3rem] flex items-center justify-center">
+            ${medals[index] ? `<span class="text-2xl">${medals[index]}</span>` : `<span>${index + 1}</span>`}
           </div>
           <div class="min-w-0 flex-grow">
             <div class="flex items-center font-semibold text-gray-800 text-base md:text-lg group-hover:text-primary">
@@ -625,10 +624,11 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="flex items-center justify-between p-4 md:p-6 hover:bg-gray-50 transition-colors cursor-pointer" data-maker="${escapeHtml(item.maker)}" onclick="goToMakerProducts(this.dataset.maker)">
           <div class="flex items-center space-x-4">
             <div class="flex items-center space-x-3">
-              <div class="text-lg font-bold text-gray-600 min-w-[3rem] flex items-center space-x-1">
-                <span>${item.rank}</span>
+              <div class="text-lg font-bold text-gray-600 min-w-[3rem] flex items-center justify-center">
                 ${
-                  item.medal ? `<span class="text-xl">${item.medal}</span>` : ''
+                  item.medal
+                    ? `<span class="text-2xl">${item.medal}</span>`
+                    : `<span>${item.rank}</span>`
                 }
               </div>
             </div>
