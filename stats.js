@@ -42,6 +42,8 @@ document.addEventListener('DOMContentLoaded', function () {
     'daily-chart-container'
   );
   const dailyChartEl = document.getElementById('daily-launches-chart');
+  const topProductsEl = document.getElementById('top-products');
+  const topProductsListEl = document.getElementById('top-products-list');
 
   let allProducts = [];
   let allMakers = [];
@@ -138,6 +140,14 @@ document.addEventListener('DOMContentLoaded', function () {
         count: makerCounts[maker],
         lastLaunchDate: lastLaunchDate,
       }));
+  }
+
+  // Function to pick the products with the most reactions
+  function calculateTopProducts(products, limit = 5) {
+    return products
+      .filter((product) => product['Product Link'])
+      .sort((a, b) => (b['Reaction Count'] ?? 0) - (a['Reaction Count'] ?? 0))
+      .slice(0, limit);
   }
 
   // Format date as YYYY-MM-DD using local time (avoids UTC timezone shift)
@@ -512,6 +522,53 @@ document.addEventListener('DOMContentLoaded', function () {
     statsOverviewEl.classList.remove('hidden');
   }
 
+  // Function to render the top products card
+  function renderTopProducts(products) {
+    if (!topProductsEl || !topProductsListEl || products.length === 0) return;
+
+    const medals = ['🥇', '🥈', '🥉'];
+
+    topProductsListEl.innerHTML = products
+      .map((product, index) => {
+        const productLink = safeUrl(product['Product Link']);
+        let domain = '';
+        try {
+          domain = new URL(productLink).hostname;
+        } catch (e) {
+          domain = '';
+        }
+        const launchDate = new Date(product['Date']).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+        });
+
+        return `
+        <a href="${escapeHtml(productLink)}" target="_blank" rel="noopener" class="flex items-center gap-3 md:gap-4 p-4 md:px-6 hover:bg-gray-50 transition-colors group">
+          <div class="text-lg font-bold text-gray-600 min-w-[3rem] flex items-center space-x-1">
+            <span>${index + 1}</span>
+            ${medals[index] ? `<span class="text-xl">${medals[index]}</span>` : ''}
+          </div>
+          <div class="min-w-0 flex-grow">
+            <div class="flex items-center font-semibold text-gray-800 text-base md:text-lg group-hover:text-primary">
+              <img src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}" alt="" class="mr-2 h-4 w-4 shrink-0" />
+              <span class="truncate">${escapeHtml(product['Product Name'])}</span>
+            </div>
+            <div class="text-sm text-gray-500 truncate">${escapeHtml(product['Maker'])} · ${launchDate}</div>
+          </div>
+          <div class="flex items-center gap-1.5 text-gray-700 shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <span class="font-semibold">${product['Reaction Count'] ?? 0}</span>
+          </div>
+        </a>
+      `;
+      })
+      .join('');
+
+    topProductsEl.classList.remove('hidden');
+  }
+
   // Function to render full leaderboard
   function renderLeaderboard(makers, tabType = 'most-launches') {
     if (!leaderboardListEl) return;
@@ -677,6 +734,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (tabSwitcherEl) {
           tabSwitcherEl.style.display = 'flex';
         }
+
+        renderTopProducts(calculateTopProducts(allProducts));
 
         // Render daily chart
         renderDailyChart(dailyLaunchesData);
