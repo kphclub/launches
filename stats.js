@@ -631,33 +631,10 @@ document.addEventListener('DOMContentLoaded', function () {
       return;
     }
 
-    // Calculate ranks and medals separately
-    const makersWithRanks = makers.map((item, index) => {
-      const position = index + 1; // Always sequential position numbers
-
-      // Calculate medal rank for most launches tab (consecutive ranks for ties)
-      let medalRank = null;
-      let medal = '';
-
-      if (tabType === 'most-launches') {
-        // Find unique product counts and assign consecutive medal ranks
-        const uniqueCounts = [...new Set(makers.map((m) => m.count))].sort(
-          (a, b) => b - a
-        );
-        medalRank = uniqueCounts.indexOf(item.count) + 1;
-
-        if (medalRank === 1) medal = '🥇';
-        else if (medalRank === 2) medal = '🥈';
-        else if (medalRank === 3) medal = '🥉';
-      }
-
-      return {
-        ...item,
-        rank: position,
-        medalRank: medalRank,
-        medal: medal,
-      };
-    });
+    const makersWithRanks = makers.map((item, index) => ({
+      ...item,
+      rank: index + 1,
+    }));
 
     // Helper function to format date
     function formatDate(date) {
@@ -675,11 +652,7 @@ document.addEventListener('DOMContentLoaded', function () {
           <div class="flex items-center space-x-4">
             <div class="flex items-center space-x-3">
               <div class="text-lg font-bold text-gray-600 min-w-[3rem] flex items-center justify-center">
-                ${
-                  item.medal
-                    ? `<span class="text-2xl">${item.medal}</span>`
-                    : `<span>${item.rank}</span>`
-                }
+                <span>${item.rank}</span>
               </div>
             </div>
             <div>
