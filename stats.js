@@ -44,6 +44,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const dailyChartEl = document.getElementById('daily-launches-chart');
   const topProductsEl = document.getElementById('top-products');
   const topProductsListEl = document.getElementById('top-products-list');
+  const topMakersEl = document.getElementById('top-makers');
+  const topMakersListEl = document.getElementById('top-makers-list');
 
   let allProducts = [];
   let allMakers = [];
@@ -147,6 +149,23 @@ document.addEventListener('DOMContentLoaded', function () {
     return products
       .filter((product) => product['Product Link'])
       .sort((a, b) => (b['Reaction Count'] ?? 0) - (a['Reaction Count'] ?? 0))
+      .slice(0, limit);
+  }
+
+  // Function to rank makers by the total reactions across their launches
+  function calculateTopMakers(products, limit = 5) {
+    const makerStats = {};
+
+    products.forEach((product) => {
+      const maker = product['Maker'];
+      if (!maker || maker === 'Unknown') return;
+      makerStats[maker] = makerStats[maker] || { maker, reactions: 0, count: 0 };
+      makerStats[maker].reactions += product['Reaction Count'] ?? 0;
+      makerStats[maker].count += 1;
+    });
+
+    return Object.values(makerStats)
+      .sort((a, b) => b.reactions - a.reactions || b.count - a.count)
       .slice(0, limit);
   }
 
@@ -568,6 +587,37 @@ document.addEventListener('DOMContentLoaded', function () {
     topProductsEl.classList.remove('hidden');
   }
 
+  // Function to render the top makers card
+  function renderTopMakers(makers) {
+    if (!topMakersEl || !topMakersListEl || makers.length === 0) return;
+
+    const medals = ['🥇', '🥈', '🥉'];
+
+    topMakersListEl.innerHTML = makers
+      .map(
+        (item, index) => `
+        <div class="flex items-center gap-3 md:gap-4 p-4 md:px-6 hover:bg-gray-50 transition-colors cursor-pointer group" data-maker="${escapeHtml(item.maker)}" onclick="goToMakerProducts(this.dataset.maker)">
+          <div class="text-lg font-bold text-gray-600 min-w-[3rem] flex items-center justify-center">
+            ${medals[index] ? `<span class="text-2xl">${medals[index]}</span>` : `<span>${index + 1}</span>`}
+          </div>
+          <div class="min-w-0 flex-grow">
+            <div class="font-semibold text-gray-800 text-base md:text-lg truncate group-hover:text-primary">${escapeHtml(item.maker)}</div>
+            <div class="text-sm text-gray-500">${item.count} launch${item.count !== 1 ? 'es' : ''}</div>
+          </div>
+          <div class="flex items-center gap-1.5 text-gray-700 shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+            <span class="font-semibold">${item.reactions}</span>
+          </div>
+        </div>
+      `
+      )
+      .join('');
+
+    topMakersEl.classList.remove('hidden');
+  }
+
   // Function to render full leaderboard
   function renderLeaderboard(makers, tabType = 'most-launches') {
     if (!leaderboardListEl) return;
@@ -736,6 +786,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         renderTopProducts(calculateTopProducts(allProducts));
+        renderTopMakers(calculateTopMakers(allProducts));
 
         // Render daily chart
         renderDailyChart(dailyLaunchesData);
